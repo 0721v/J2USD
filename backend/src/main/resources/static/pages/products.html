@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兰雀Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body class="page-container">
+  <nav id="navbar" class="fixed top-0 left-0 right-0 bg-white z-50">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <!-- Logo 区域（左侧） -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="site-logo-container hidden"></div>
+        <span class="text-lg font-bold text-blue-500 site-name">礼品卡平台</span>
+      </div>
+
+      <!-- 导航链接（中间） -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="#" id="nav-home" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/index.html')">首页</a>
+        <a href="#" id="nav-products" class="text-blue-500 font-medium" onclick="navigateTo('pages/products.html')">商品</a>
+        <a href="#" id="nav-redeem" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/redeem.html')">查询</a>
+      </div>
+
+      <!-- 右侧：语言切换 -->
+      <div class="hidden md:flex items-center gap-1 text-sm">
+        <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+        <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+        <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+        <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+      </div>
+
+      <!-- 移动端汉堡菜单按钮 -->
+      <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+        <svg id="mobileMenuIcon" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 移动端展开菜单 -->
+    <div id="mobileMenu" class="md:hidden bg-white border-t border-gray-100 hidden">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/index.html'); toggleMobileMenu()">首页</a>
+        <a href="#" class="block py-2 px-3 rounded-lg bg-blue-50 text-blue-500" onclick="navigateTo('pages/products.html'); toggleMobileMenu()">商品</a>
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/redeem.html'); toggleMobileMenu()">查询</a>
+        <div class="pt-3 border-t border-gray-100 flex gap-4">
+          <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+          <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+          <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+          <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-6xl mx-auto px-4 pt-20 pb-20">
+    <h1 id="pageTitle" class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">商品列表</h1>
+
+    <!-- 分类筛选 -->
+    <div class="categories mb-6">
+      <div id="categoryButtons" class="flex flex-wrap gap-2 justify-center">
+        <!-- 分类按钮会动态生成 -->
+      </div>
+    </div>
+
+    <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+      <!-- Products will be loaded dynamically -->
+    </div>
+
+    <div id="loading" class="flex justify-center py-12">
+      <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
+    <div id="errorMsg" class="hidden text-center py-12">
+      <p class="text-gray-500 mb-4">加载失败，请检查后端服务是否启动</p>
+      <button onclick="loadProducts()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">重试</button>
+    </div>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 md:hidden">
+    <div class="flex items-center justify-around h-14">
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="text-xs font-medium">首页</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-blue-500" onclick="navigateTo('pages/products.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <span class="text-xs font-medium">商品</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/redeem.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="text-xs font-medium">查询</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="../assets/js/common.js"></script>
+  <script>
+    const API_BASE_URL = '/api';
+    let products = [];
+    let categories = [];
+    let selectedCategory = null;
+
+    // 加载分类
+    async function loadCategories() {
+      try {
+        const lang = getCurrentLang();
+        const response = await fetch(`${API_BASE_URL}/products/categories?lang=${lang}`);
+        const data = await response.json();
+        
+        if (data.code === 200) {
+          categories = data.data.categories || [];
+          renderCategoryButtons();
+        }
+      } catch (error) {
+        console.error('加载分类失败:', error);
+      }
+    }
+
+    // 渲染分类按钮
+    function renderCategoryButtons() {
+      const container = document.getElementById('categoryButtons');
+      const msg = getMessages();
+      const lang = getCurrentLang();
+      
+      let html = `
+        <button id="cat-all" onclick="filterProducts(null)" class="px-4 py-2 rounded-full text-sm font-medium ${selectedCategory === null ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}">
+          ${msg.common.all}
+        </button>
+      `;
+      
+      categories.forEach(cat => {
+        // 后端已将当前语言名称写入nameZh字段
+        const name = cat.nameZh || cat.name || '分类';
+        const isActive = selectedCategory === cat.id;
+        html += `
+          <button id="cat-${cat.id}" onclick="filterProducts(${cat.id})" class="px-4 py-2 rounded-full text-sm font-medium ${isActive ? 'bg-blue-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-100'}">
+            ${name}
+          </button>
+        `;
+      });
+      
+      container.innerHTML = html;
+    }
+
+    // 加载商品列表
+    async function loadProducts() {
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('errorMsg').classList.add('hidden');
+      document.getElementById('productsGrid').innerHTML = '';
+      
+      try {
+        const lang = getCurrentLang();
+        let url = `${API_BASE_URL}/products?lang=${lang}`;
+        if (selectedCategory) {
+          url += `&categoryId=${selectedCategory}`;
+        }
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        document.getElementById('loading').style.display = 'none';
+        
+        if (data.code === 200) {
+          products = data.data.products || [];
+          renderProducts();
+        } else {
+          showError();
+        }
+      } catch (error) {
+        console.error('加载商品失败:', error);
+        document.getElementById('loading').style.display = 'none';
+        showError();
+      }
+    }
+
+    function showError() {
+      document.getElementById('errorMsg').classList.remove('hidden');
+    }
+
+    // 筛选商品
+    function filterProducts(categoryId) {
+      selectedCategory = categoryId;
+      renderCategoryButtons();
+      loadProducts();
+    }
+
+    // 渲染商品列表
+    function renderProducts() {
+      const grid = document.getElementById('productsGrid');
+      const msg = getMessages();
+      const lang = getCurrentLang();
+      
+      if (products.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full text-center py-12">
+            <p class="text-gray-500">暂无商品</p>
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = '';
+
+      products.forEach(product => {
+        // 后端返回的是扁平化结构，name和description已经是当前语言
+        const name = product.nameZh || product.name || '商品';
+        const description = product.description || '';
+        const price = product.price;
+        const currency = product.currency || 'CNY';
+        const stock = product.stockQuantity || 0;
+        const imageUrl = product.imageUrl;
+        const defaultImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300' fill='none'%3E%3Crect width='300' height='300' fill='%23f3f4f6'/%3E%3Cpath d='M130 110h40v40h-40z' fill='%23d1d5db'/%3E%3Cpath d='M100 170l30-30 20 20 30-40 50 50v10H100v-10z' fill='%239ca3af'/%3E%3Ccircle cx='150' cy='90' r='8' fill='%239ca3af'/%3E%3C/svg%3E";
+        const productId = product.id;
+        
+        const card = document.createElement('div');
+        card.className = 'product-card bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 cursor-pointer';
+        card.onclick = () => goToProductDetail(productId);
+        card.innerHTML = `
+          <div class="product-image aspect-square bg-gray-100 overflow-hidden">
+            <img src="${imageUrl || defaultImg}" alt="${name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${defaultImg}'" />
+          </div>
+          <div class="product-info p-4">
+            <h3 class="text-base font-semibold text-gray-800 mb-2 line-clamp-1">${name}</h3>
+            <p class="text-sm text-gray-500 mb-3 line-clamp-2">${description}</p>
+            <div class="product-meta flex justify-between items-center mb-3">
+              <span class="text-red-500 font-bold text-lg">${currency} ${price}</span>
+              <span class="text-gray-400 text-xs">${msg.product.stock}: ${stock}</span>
+            </div>
+            <button ${stock === 0 ? 'disabled' : ''}
+              class="w-full py-2 rounded-lg font-medium transition-all ${stock === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}"
+              onclick="event.stopPropagation(); goToProductDetail(${productId})">
+              ${stock === 0 ? msg.product.outOfStock : msg.product.buyNow}
+            </button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // 跳转到商品详情/购买页面
+    function goToProductDetail(productId) {
+      const lang = getCurrentLang();
+      navigateTo(`pages/product.html?id=${productId}&lang=${lang}`);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 加载网站设置
+      loadSiteSettings().then(() => {
+        applySiteSettings();
+      });
+      const msg = getMessages();
+      document.getElementById('pageTitle').textContent = msg.product.title;
+      loadCategories();
+      loadProducts();
+
+      // 添加页面加载完成动画
+      setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 50);
+    });
+  </script>
+</body>
+</html>

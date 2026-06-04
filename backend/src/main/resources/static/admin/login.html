@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兰雀Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <!-- Toast 容器 -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[99999] space-y-2"></div>
+  <div class="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
+    <div class="text-center mb-8">
+      <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">管理后台登录</h1>
+      <p class="text-gray-500 mt-2">Gift Card Admin Panel</p>
+    </div>
+
+    <form id="loginForm" class="space-y-6">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">用户名</label>
+        <input 
+          type="text" 
+          id="username" 
+          required
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+          placeholder="请输入用户名"
+        >
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">密码</label>
+        <input 
+          type="password" 
+          id="password" 
+          required
+          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+          placeholder="请输入密码"
+        >
+      </div>
+
+      <div id="errorMsg" class="hidden bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm"></div>
+
+      <button 
+        type="submit" 
+        id="loginBtn"
+        class="w-full bg-blue-500 hover:bg-blue-600 text-white font-medium py-3 rounded-lg transition duration-200 flex items-center justify-center gap-2"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+        </svg>
+        登录
+      </button>
+    </form>
+
+    <div class="mt-6 text-center">
+      <a href="../pages/index.html" class="text-sm text-gray-500 hover:text-blue-500 transition">
+        ← 返回首页
+      </a>
+    </div>
+  </div>
+
+  <script src="../assets/js/common.js"></script>
+  <script>
+    // ========== Toast 提示 ==========
+    function showToast(message, type) {
+      const container = document.getElementById('toastContainer');
+      if (!container) return;
+      const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500', warning: 'bg-yellow-500' };
+      const icons = {
+        success: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>',
+        error: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>',
+        info: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+        warning: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>'
+      };
+      const toast = document.createElement('div');
+      toast.className = `flex items-center gap-3 px-5 py-3 rounded-lg text-white shadow-lg ${colors[type] || colors.info} transform translate-x-full transition-transform duration-300`;
+      toast.innerHTML = '<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">' + (icons[type] || icons.info) + '</svg><span class="text-sm font-medium">' + message + '</span>';
+      container.appendChild(toast);
+      requestAnimationFrame(() => { toast.classList.remove('translate-x-full'); toast.classList.add('translate-x-0'); });
+      setTimeout(() => { toast.classList.remove('translate-x-0'); toast.classList.add('translate-x-full'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    const API_BASE_URL = '/api';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const loginBtn = document.getElementById('loginBtn');
+      const errorMsg = document.getElementById('errorMsg');
+
+      // 禁用按钮
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 登录中...';
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/admin/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ username, password })
+        });
+
+        const data = await response.json();
+
+        if (data.code === 200) {
+          // 保存登录信息
+          localStorage.setItem('adminToken', data.data.token);
+          localStorage.setItem('adminUser', JSON.stringify({
+            username: data.data.username,
+            role: data.data.role
+          }));
+
+          showToast('登录成功', 'success');
+
+          // 跳转到管理后台
+          window.location.href = 'index.html';
+        } else {
+          showToast('用户名或密码错误', 'error');
+        }
+      } catch (error) {
+        showToast('网络错误，请检查后端服务是否启动', 'error');
+        console.error('登录错误:', error);
+      } finally {
+        // 恢复按钮
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path></svg> 登录';
+      }
+    });
+
+    // 检查是否已登录
+    if (localStorage.getItem('adminToken')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

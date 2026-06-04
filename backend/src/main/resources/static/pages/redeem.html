@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兰雀Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body class="page-container">
+  <nav id="navbar" class="fixed top-0 left-0 right-0 bg-white z-50">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <!-- Logo 区域（左侧） -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="site-logo-container hidden"></div>
+        <span class="text-lg font-bold text-blue-500 site-name">礼品卡平台</span>
+      </div>
+
+      <!-- 导航链接（中间） -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="#" id="nav-home" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/index.html')">首页</a>
+        <a href="#" id="nav-products" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/products.html')">商品</a>
+        <a href="#" id="nav-redeem" class="text-blue-500 font-medium" onclick="navigateTo('pages/redeem.html')">查询</a>
+      </div>
+
+      <!-- 右侧：语言切换 -->
+      <div class="hidden md:flex items-center gap-1 text-sm">
+        <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+        <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+        <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+        <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+      </div>
+
+      <!-- 移动端汉堡菜单按钮 -->
+      <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+        <svg id="mobileMenuIcon" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 移动端展开菜单 -->
+    <div id="mobileMenu" class="md:hidden bg-white border-t border-gray-100 hidden">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/index.html'); toggleMobileMenu()">首页</a>
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/products.html'); toggleMobileMenu()">商品</a>
+        <a href="#" class="block py-2 px-3 rounded-lg bg-blue-50 text-blue-500" onclick="navigateTo('pages/redeem.html'); toggleMobileMenu()">查询</a>
+        <div class="pt-3 border-t border-gray-100 flex gap-4">
+          <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+          <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+          <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+          <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-md mx-auto px-4 pt-20 pb-20">
+    <div class="card bg-white rounded-xl shadow-sm p-6">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+        </div>
+        <h2 class="text-xl font-bold text-gray-800">查询卡密</h2>
+        <p class="text-gray-500 text-sm mt-2">输入邮箱和查询密码查看您的卡密</p>
+      </div>
+
+      <form id="queryForm">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+          <input type="email" id="queryEmail" placeholder="请输入购买时填写的邮箱"
+            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+        </div>
+        
+        <div class="mb-6">
+          <label class="block text-sm font-medium text-gray-700 mb-2">查询密码</label>
+          <input type="password" id="queryPassword" placeholder="请输入购买时设置的查询密码"
+            class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          查询
+        </button>
+      </form>
+
+      <div id="result" class="mt-6 hidden">
+        <div id="resultContent"></div>
+      </div>
+
+      <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+        <h4 class="font-medium text-gray-700 mb-2">使用说明</h4>
+        <ul class="text-sm text-gray-500 space-y-1">
+          <li>• 请使用购买时填写的邮箱</li>
+          <li>• 查询密码为购买时设置的密码</li>
+          <li>• 仅显示已支付完成的订单</li>
+          <li>• 如有问题请联系客服</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 md:hidden">
+    <div class="flex items-center justify-around h-14">
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="text-xs font-medium">首页</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/products.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <span class="text-xs font-medium">商品</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-blue-500" onclick="navigateTo('pages/redeem.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <span class="text-xs font-medium">查询</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="../assets/js/common.js"></script>
+  <script>
+    const API_BASE_URL = '/api';
+
+    async function handleQuery(event) {
+      event.preventDefault();
+      
+      const email = document.getElementById('queryEmail').value.trim();
+      const queryPassword = document.getElementById('queryPassword').value.trim();
+      const submitBtn = document.getElementById('submitBtn');
+      const result = document.getElementById('result');
+      const resultContent = document.getElementById('resultContent');
+      
+      if (!email) {
+        showResult(false, '请输入邮箱');
+        return;
+      }
+
+      if (!queryPassword) {
+        showResult(false, '请输入查询密码');
+        return;
+      }
+
+      // 禁用按钮
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        查询中...
+      `;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/orders/query-by-email?lang=${getCurrentLang()}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            email: email,
+            queryPassword: queryPassword
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.code === 200) {
+          showOrders(data.data.orders);
+        } else {
+          showResult(false, data.message || '查询失败，请检查邮箱和查询密码');
+        }
+      } catch (error) {
+        console.error('查询失败:', error);
+        showResult(false, '网络错误，请检查后端服务是否启动');
+      } finally {
+        // 恢复按钮
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          查询
+        `;
+      }
+    }
+
+    function showOrders(orders) {
+      const result = document.getElementById('result');
+      const resultContent = document.getElementById('resultContent');
+      
+      result.className = 'mt-6';
+      result.classList.remove('hidden');
+      
+      let html = '<div class="space-y-4">';
+      
+      orders.forEach(order => {
+        const cards = order.giftCards || [];
+        const productName = order.product?.name || '商品';
+        
+        html += `
+          <div class="bg-white border border-gray-200 rounded-lg p-4">
+            <div class="flex justify-between items-center mb-2">
+              <span class="font-medium text-gray-800">${productName}</span>
+              <span class="text-sm text-gray-500">${order.orderNo}</span>
+            </div>
+            <div class="text-sm text-gray-500 mb-3">${order.currency} ${order.totalAmount}</div>
+            <div class="space-y-2">
+        `;
+        
+        cards.forEach((card, index) => {
+          html += `
+            <div class="bg-gray-50 rounded p-2 flex justify-between items-center">
+              <span class="font-mono text-sm">${card.cardCode}</span>
+              <button onclick="copyToClipboard('${card.cardCode}')" class="text-blue-500 text-sm hover:text-blue-600">
+                复制
+              </button>
+            </div>
+          `;
+        });
+        
+        html += '</div></div>';
+      });
+      
+      html += '</div>';
+      resultContent.innerHTML = html;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('已复制到剪贴板');
+      }).catch(() => {
+        // 降级方案
+        const input = document.createElement('input');
+        input.value = text;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        alert('已复制到剪贴板');
+      });
+    }
+
+    function showResult(success, message) {
+      const result = document.getElementById('result');
+      const content = document.getElementById('resultContent');
+      
+      result.className = `mt-6 ${success ? 'bg-green-50' : 'bg-red-50'} rounded-lg p-4`;
+      result.classList.remove('hidden');
+      
+      content.innerHTML = `
+        <div class="flex items-center gap-3">
+          <svg class="w-8 h-8 ${success ? 'text-green-500' : 'text-red-500'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${success ? 'M5 13l4 4L19 7' : 'M6 18L18 6M6 6l12 12'}"></path>
+          </svg>
+          <div>
+            <p class="${success ? 'text-green-700 font-medium' : 'text-red-700 font-medium'}">${success ? '查询成功' : '查询失败'}</p>
+            <p class="text-gray-600 text-sm mt-1">${message}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    document.getElementById('queryForm').addEventListener('submit', handleQuery);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // 加载网站设置
+      loadSiteSettings().then(() => {
+        applySiteSettings();
+      });
+
+      // 添加页面加载完成动画
+      setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 50);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兰雀Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body class="page-container">
+  <nav id="navbar" class="fixed top-0 left-0 right-0 bg-white z-50">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <!-- Logo 区域（左侧） -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="site-logo-container hidden"></div>
+        <span class="text-lg font-bold text-blue-500 site-name">礼品卡平台</span>
+      </div>
+
+      <!-- 导航链接（中间） -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="#" id="nav-home" class="text-blue-500 font-medium" onclick="navigateTo('pages/index.html')">首页</a>
+        <a href="#" id="nav-products" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/products.html')">商品</a>
+        <a href="#" id="nav-redeem" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/redeem.html')">查询</a>
+      </div>
+
+      <!-- 右侧：语言切换 -->
+      <div class="hidden md:flex items-center gap-1 text-sm">
+        <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+        <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+        <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+        <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+      </div>
+
+      <!-- 移动端汉堡菜单按钮 -->
+      <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+        <svg id="mobileMenuIcon" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 移动端展开菜单 -->
+    <div id="mobileMenu" class="md:hidden bg-white border-t border-gray-100 hidden">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#" class="block py-2 px-3 rounded-lg bg-blue-50 text-blue-500" onclick="navigateTo('pages/index.html'); toggleMobileMenu()">首页</a>
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/products.html'); toggleMobileMenu()">商品</a>
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/redeem.html'); toggleMobileMenu()">查询</a>
+        <div class="pt-3 border-t border-gray-100 flex gap-4">
+          <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+          <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+          <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+          <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="pt-20" style="display:flex;flex-direction:column;min-height:calc(100vh - 5rem);">
+    <section class="hero bg-gradient-to-br from-blue-500 to-blue-600 text-white py-16 md:py-24">
+      <div class="max-w-6xl mx-auto px-4 text-center">
+        <h1 id="hero-title" class="text-3xl md:text-5xl font-bold mb-4">安全便捷的礼品卡发卡平台</h1>
+        <p id="hero-subtitle" class="text-lg md:text-xl text-blue-100 mb-8">支持多种支付方式，快速发货</p>
+        <button id="hero-btn" onclick="navigateTo('pages/products.html')" class="btn-primary text-lg px-8 py-4 rounded-xl">立即开始</button>
+      </div>
+    </section>
+
+    <section class="payment-methods py-12 bg-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 id="payment-title" class="text-2xl font-bold text-center text-gray-800 mb-8">支持多种支付方式</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="card p-6 text-center">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 id="payment-wechat" class="font-medium text-gray-800">微信支付</h3>
+          </div>
+          <div class="card p-6 text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 id="payment-alipay" class="font-medium text-gray-800">支付宝</h3>
+          </div>
+          <div class="card p-6 text-center">
+            <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <h3 id="payment-usdt" class="font-medium text-gray-800">USDT (TRC20)</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works py-12 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-4">
+        <h2 id="how-title" class="text-2xl font-bold text-center text-gray-800 mb-8">如何购买</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-blue-500 font-bold text-xl">1</span>
+            </div>
+            <h3 id="how-step1" class="font-medium text-gray-800 mb-2">选择商品</h3>
+            <p id="how-step1-desc" class="text-gray-500">浏览我们的商品列表</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-blue-500 font-bold text-xl">2</span>
+            </div>
+            <h3 id="how-step2" class="font-medium text-gray-800 mb-2">完成支付</h3>
+            <p id="how-step2-desc" class="text-gray-500">选择您喜欢的支付方式</p>
+          </div>
+          <div class="text-center">
+            <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span class="text-blue-500 font-bold text-xl">3</span>
+            </div>
+            <h3 id="how-step3" class="font-medium text-gray-800 mb-2">获取卡密</h3>
+            <p id="how-step3-desc" class="text-gray-500">兑换码将发送到您的邮箱</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="bg-gray-800 text-white py-8" style="margin-top:auto;">
+      <div class="max-w-6xl mx-auto px-4 text-center">
+        <div class="flex items-center justify-center gap-2 mb-4">
+          <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="text-lg font-bold site-name">礼品卡平台</span>
+        </div>
+        <p id="footer-rights" class="text-gray-400 text-sm">2024 保留所有权利</p>
+      </div>
+    </footer>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 md:hidden">
+    <div class="flex items-center justify-around h-14">
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-blue-500" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="text-xs font-medium">首页</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/products.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <span class="text-xs font-medium">商品</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/redeem.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="text-xs font-medium">查询</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="../assets/js/common.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 加载网站设置
+      loadSiteSettings().then(() => {
+        applySiteSettings();
+      });
+      const msg = getMessages();
+      document.getElementById('nav-home').textContent = msg.nav.home;
+      document.getElementById('nav-products').textContent = msg.nav.products;
+      document.getElementById('nav-redeem').textContent = msg.nav.redeem;
+      document.getElementById('hero-title').textContent = msg.hero.title;
+      document.getElementById('hero-subtitle').textContent = msg.hero.subtitle;
+      document.getElementById('hero-btn').textContent = msg.hero.getStarted;
+      document.getElementById('payment-title').textContent = msg.payment.title;
+      document.getElementById('payment-wechat').textContent = msg.payment.wechat;
+      document.getElementById('payment-alipay').textContent = msg.payment.alipay;
+      document.getElementById('payment-usdt').textContent = msg.payment.usdt;
+      document.getElementById('how-title').textContent = msg.how.title;
+      document.getElementById('how-step1').textContent = msg.how.step1;
+      document.getElementById('how-step1-desc').textContent = msg.how.step1Desc;
+      document.getElementById('how-step2').textContent = msg.how.step2;
+      document.getElementById('how-step2-desc').textContent = msg.how.step2Desc;
+      document.getElementById('how-step3').textContent = msg.how.step3;
+      document.getElementById('how-step3-desc').textContent = msg.how.step3Desc;
+      document.getElementById('footer-rights').textContent = msg.footer.rights;
+
+      // 添加页面加载完成动画
+      setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 50);
+    });
+  </script>
+</body>
+</html>

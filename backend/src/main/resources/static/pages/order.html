@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兰雀Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body class="page-container">
+  <nav id="navbar" class="fixed top-0 left-0 right-0 bg-white z-50">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <!-- Logo 区域（左侧） -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="site-logo-container hidden"></div>
+        <span class="text-lg font-bold text-blue-500 site-name">礼品卡平台</span>
+      </div>
+
+      <!-- 导航链接（中间） -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="#" id="nav-home" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/index.html')">首页</a>
+        <a href="#" id="nav-products" class="text-blue-500 font-medium" onclick="navigateTo('pages/products.html')">商品</a>
+        <a href="#" id="nav-redeem" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/redeem.html')">查询</a>
+      </div>
+
+      <!-- 右侧：语言切换 -->
+      <div class="hidden md:flex items-center gap-1 text-sm">
+        <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+        <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+        <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+        <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+      </div>
+
+      <!-- 移动端汉堡菜单按钮 -->
+      <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+        <svg id="mobileMenuIcon" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 移动端展开菜单 -->
+    <div id="mobileMenu" class="md:hidden bg-white border-t border-gray-100 hidden">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/index.html'); toggleMobileMenu()">首页</a>
+        <a href="#" class="block py-2 px-3 rounded-lg bg-blue-50 text-blue-500" onclick="navigateTo('pages/products.html'); toggleMobileMenu()">商品</a>
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/redeem.html'); toggleMobileMenu()">查询</a>
+        <div class="pt-3 border-t border-gray-100 flex gap-4">
+          <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+          <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+          <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+          <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-md mx-auto px-4 pt-20 pb-24 md:pb-20">
+    <div id="orderContent">
+      <div id="loading" class="flex justify-center py-12">
+        <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 md:hidden">
+    <div class="flex items-center justify-around h-14">
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="text-xs font-medium">首页</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/products.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <span class="text-xs font-medium">商品</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/redeem.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="text-xs font-medium">查询</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="../assets/js/common.js"></script>
+  <script>
+    const API_BASE_URL = '/api';
+    let order = null;
+
+    const statusMap = {
+      0: '待支付',
+      1: '已支付',
+      2: '处理中',
+      3: '已完成',
+      4: '已取消'
+    };
+
+    const statusBgColor = {
+      0: 'bg-yellow-500',
+      1: 'bg-blue-500',
+      2: 'bg-blue-500',
+      3: 'bg-green-500',
+      4: 'bg-red-500'
+    };
+
+    const paymentMap = {
+      wechat: '微信支付',
+      alipay: '支付宝',
+      trc20: 'USDT (TRC20)',
+      okx: 'OKX（TRC20）'
+    };
+
+    function loadOrder() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderStr = urlParams.get('order');
+      
+      if (orderStr) {
+        try {
+          order = JSON.parse(decodeURIComponent(orderStr));
+          // 从URL获取订单号，查询最新状态
+          queryOrderStatus();
+        } catch (e) {
+          console.error('Failed to parse order:', e);
+          navigateTo('pages/products.html');
+        }
+      } else {
+        navigateTo('pages/products.html');
+      }
+    }
+
+    async function queryOrderStatus() {
+      const orderNo = order.orderNo || order.order_no;
+      if (!orderNo) {
+        renderOrder();
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/orders/${orderNo}?lang=${getCurrentLang()}`);
+        const data = await response.json();
+
+        if (data.code === 200 && data.data) {
+          order = { ...order, ...data.data };
+          // 如果API返回了兑换码，用API返回的
+          if (data.data.giftCards && data.data.giftCards.length > 0) {
+            order.giftCards = data.data.giftCards;
+          }
+        }
+      } catch (error) {
+        console.error('查询订单失败:', error);
+      } finally {
+        renderOrder();
+      }
+    }
+
+    function renderOrder() {
+      const container = document.getElementById('orderContent');
+      const loading = document.getElementById('loading');
+      const msg = getMessages();
+      const defaultImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' fill='none'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3Cpath d='M40 35h20v20H40z' fill='%23d1d5db'/%3E%3Cpath d='M30 65l15-15 10 10 15-20 20 20v5H30v-5z' fill='%239ca3af'/%3E%3C/svg%3E";
+      
+      loading.style.display = 'none';
+
+      const status = order.status || 0;
+      const currency = order.currency || 'CNY';
+      const amount = order.amount || order.totalAmount || order.total_amount || 0;
+      const productName = order.productName || order.name || order.name_zh || '商品';
+      const quantity = order.quantity || 1;
+      const paymentMethod = order.paymentMethod || order.payment_method || 'wechat';
+      const giftCards = (order.status === 3 && order.giftCards) ? order.giftCards : [];
+
+      const giftCardsHtml = giftCards.length ? `
+        <div class="card bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-medium text-gray-800 mb-4">${msg.order.copyCode}</h3>
+          <div class="space-y-3">
+            ${giftCards.map((card, index) => `
+              <div class="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                <input value="${card.cardCode || card.code || card}" readonly class="flex-1 px-4 py-2 bg-white rounded border border-gray-200 font-mono text-gray-800 text-sm" />
+                <button onclick="copyToClipboard('${card.cardCode || card.code || card}')" class="px-4 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600">
+                  复制
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : '';
+
+      container.innerHTML = `
+        <div class="${statusBgColor[status]} p-6 rounded-xl text-white mb-6">
+          <div class="flex items-center justify-between">
+            <div>
+              <h2 class="text-xl font-bold">${statusMap[status]}</h2>
+              <p class="text-white/80 text-sm mt-1">${msg.order.orderNo}: ${order.orderNo || order.order_no}</p>
+            </div>
+            <div class="w-12 h-12 rounded-full flex items-center justify-center ${status === 3 ? 'bg-green-400' : status === 1 || status === 2 ? 'bg-blue-400' : 'bg-yellow-400'}">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${status === 3 ? 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' : status === 1 || status === 2 ? 'M5 13l4 4L19 7' : 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'}"></path>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="card bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-medium text-gray-800 mb-4">${msg.order.product}</h3>
+          <div class="flex items-center gap-4">
+            <img src="${order.imageUrl || defaultImg}" alt="Product" class="w-20 h-20 rounded-xl object-cover" onerror="this.onerror=null;this.src=defaultImg" />
+            <div class="flex-1">
+              <h4 class="font-medium text-gray-800">${productName}</h4>
+              <p class="text-sm text-gray-500">${msg.order.quantity}: ${quantity}</p>
+              <p class="text-red-500 font-bold mt-1">${currency} ${amount}</p>
+            </div>
+          </div>
+        </div>
+
+        ${giftCardsHtml}
+
+        <div class="card bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h3 class="font-medium text-gray-800 mb-4">订单详情</h3>
+          <div class="space-y-3">
+            <div class="flex justify-between">
+              <span class="text-gray-500">${msg.order.paymentMethod}</span>
+              <span class="text-gray-800">${paymentMap[paymentMethod] || paymentMethod}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">${msg.order.email}</span>
+              <span class="text-gray-800">${order.email || '-'}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500">创建时间</span>
+              <span class="text-gray-800 text-sm">${order.createdAt || formatTime(Date.now())}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex gap-3">
+          <button onclick="navigateTo('pages/products.html')" class="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200">
+            继续购物
+          </button>
+          <button onclick="navigateTo('pages/redeem.html')" class="flex-1 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600">
+            兑换
+          </button>
+        </div>
+      `;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('复制成功');
+      }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert('复制成功');
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadOrder();
+
+      // 添加页面加载完成动画
+      setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 50);
+    });
+  </script>
+</body>
+</html>

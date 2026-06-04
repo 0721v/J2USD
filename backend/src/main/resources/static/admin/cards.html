@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兰雀Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../assets/js/common.js"></script>
+</head>
+<body class="bg-gray-100">
+  <!-- Toast 容器 -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[99999] space-y-2"></div>
+
+  <aside class="fixed left-0 top-0 bottom-0 w-64 bg-gray-800 text-white z-50">
+    <div class="p-6 border-b border-gray-700">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg">管理后台</h1>
+          <p class="text-xs text-gray-400">Admin Panel</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="p-4 space-y-2">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6z"></path>
+        </svg>
+        仪表盘
+      </a>
+      <a href="products.html" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        商品管理
+      </a>
+      <a href="cards.html" class="flex items-center gap-3 px-4 py-3 bg-blue-600 rounded-lg text-white">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"></path>
+        </svg>
+        兑换码管理
+      </a>
+      <a href="orders.html" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"></path>
+        </svg>
+        订单管理
+      </a>
+      <a href="payment-settings.html" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+        </svg>
+        支付配置
+      </a>
+      <a href="settings.html" class="flex items-center gap-3 px-4 py-3 text-gray-300 hover:bg-gray-700 rounded-lg transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+        </svg>
+        系统设置
+      </a>
+    </nav>
+  </aside>
+
+  <main class="ml-64">
+    <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center">
+      <h2 class="text-xl font-bold text-gray-800">兑换码管理</h2>
+      <button onclick="openBatchModal()" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition flex items-center gap-2">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        批量添加兑换码
+      </button>
+    </header>
+
+    <div class="p-8 space-y-6">
+      <!-- 筛选栏 -->
+      <div class="bg-white rounded-lg shadow p-4 flex gap-4 items-center">
+        <select id="filterProduct" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+          <option value="">全部商品</option>
+        </select>
+        <select id="filterStatus" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+          <option value="">全部状态</option>
+          <option value="AVAILABLE">可用</option>
+          <option value="SOLD">已售出</option>
+          <option value="USED">已使用</option>
+        </select>
+        <button onclick="loadGiftCards()" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition">筛选</button>
+      </div>
+
+      <!-- 兑换码列表 -->
+      <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">商品名称</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">兑换码</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">状态</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">关联订单ID</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+            </tr>
+          </thead>
+          <tbody id="giftcardList" class="divide-y divide-gray-200">
+            <!-- 动态加载 -->
+          </tbody>
+        </table>
+
+        <!-- 分页 -->
+        <div class="px-6 py-4 border-t border-gray-200 flex justify-between items-center">
+          <span id="paginationInfo" class="text-sm text-gray-500">共 0 条</span>
+          <div id="pagination" class="flex gap-2">
+            <!-- 动态加载 -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- 批量添加弹窗 -->
+  <div id="batchModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center">
+    <div class="bg-white rounded-lg shadow-xl w-full max-w-md m-4">
+      <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+        <h3 class="text-lg font-bold text-gray-800">批量添加兑换码</h3>
+        <button onclick="closeBatchModal()" class="text-gray-400 hover:text-gray-600">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <form id="batchForm" class="p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">选择商品 <span class="text-red-500">*</span></label>
+          <select id="batchProduct" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+            <option value="">请选择商品</option>
+          </select>
+        </div>
+        
+        <!-- 添加方式切换 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">添加方式</label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="addMode" value="auto" checked onchange="toggleAddMode('auto')" class="w-4 h-4 text-blue-500">
+              <span class="text-sm text-gray-700">自动生成</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="addMode" value="manual" onchange="toggleAddMode('manual')" class="w-4 h-4 text-blue-500">
+              <span class="text-sm text-gray-700">手动填写</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- 自动生成模式 -->
+        <div id="autoModeSection">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">生成数量 <span class="text-red-500">*</span></label>
+            <input type="number" id="batchCount" min="1" max="1000" placeholder="请输入生成数量" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+          </div>
+        </div>
+        
+        <!-- 手动填写模式 -->
+        <div id="manualModeSection" class="hidden">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">兑换码列表 <span class="text-red-500">*</span></label>
+            <textarea id="batchCardCodes" rows="6" placeholder="每行输入一个兑换码，支持批量粘贴&#10;例如：&#10;ABC123&#10;DEF456&#10;GHI789" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none font-mono text-sm"></textarea>
+            <p class="text-xs text-gray-500 mt-1">每行一个兑换码，系统将自动去重和过滤空行</p>
+          </div>
+        </div>
+        
+        <!-- 有效期设置 -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">有效期</label>
+          <div class="flex gap-4 mb-2">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="expireMode" value="permanent" checked onchange="toggleExpireMode('permanent')" class="w-4 h-4 text-blue-500">
+              <span class="text-sm text-gray-700">永久有效</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" name="expireMode" value="custom" onchange="toggleExpireMode('custom')" class="w-4 h-4 text-blue-500">
+              <span class="text-sm text-gray-700">自定义日期</span>
+            </label>
+          </div>
+          <input type="date" id="batchExpireAt" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none hidden">
+        </div>
+        
+        <div class="flex justify-end gap-3 pt-4">
+          <button type="button" onclick="closeBatchModal()" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">取消</button>
+          <button type="submit" id="submitBtn" class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">确认生成</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE_URL = '/api';
+    let currentPage = 1;
+    let products = [];
+
+    // ========== Toast 提示 ==========
+    function showToast(message, type) {
+      const container = document.getElementById('toastContainer');
+      const colors = { success: 'bg-green-500', error: 'bg-red-500', info: 'bg-blue-500', warning: 'bg-yellow-500' };
+      const icons = {
+        success: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>',
+        error: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>',
+        info: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>',
+        warning: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `flex items-center gap-3 px-5 py-3 rounded-lg text-white shadow-lg ${colors[type] || colors.info} transform translate-x-full transition-transform duration-300`;
+      toast.innerHTML = `<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icons[type] || icons.info}</svg><span class="text-sm font-medium">${message}</span>`;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => { toast.classList.remove('translate-x-full'); toast.classList.add('translate-x-0'); });
+      setTimeout(() => { toast.classList.remove('translate-x-0'); toast.classList.add('translate-x-full'); setTimeout(() => toast.remove(), 300); }, 3000);
+    }
+
+    // ========== 登录检查 ==========
+    // checkAdminAuth 已在 DOMContentLoaded 中调用
+
+    // ========== 加载商品列表（用于筛选和弹窗） ==========
+    async function loadProducts() {
+      try {
+        const response = await adminFetch(`${API_BASE_URL}/admin/products`);
+        const data = await response.json();
+
+        if (data.code === 200) {
+          products = data.data.products || data.data || [];
+          renderProductOptions();
+        }
+      } catch (error) {
+        console.error('加载商品列表失败:', error);
+      }
+    }
+
+    function renderProductOptions() {
+      const filterSelect = document.getElementById('filterProduct');
+      const batchSelect = document.getElementById('batchProduct');
+
+      let filterOptions = '<option value="">全部商品</option>';
+      let batchOptions = '<option value="">请选择商品</option>';
+
+      products.forEach(p => {
+        const name = p.nameZh || p.name || `商品 #${p.id}`;
+        filterOptions += `<option value="${p.id}">${name}</option>`;
+        batchOptions += `<option value="${p.id}">${name}</option>`;
+      });
+
+      filterSelect.innerHTML = filterOptions;
+      batchSelect.innerHTML = batchOptions;
+    }
+
+    // ========== 加载兑换码列表 ==========
+    async function loadGiftCards(page = 1) {
+      currentPage = page;
+      const productId = document.getElementById('filterProduct').value;
+      const status = document.getElementById('filterStatus').value;
+
+      try {
+        let url = `${API_BASE_URL}/admin/giftcards?page=${page}&size=20`;
+        if (productId) url += `&productId=${productId}`;
+        if (status) url += `&status=${status}`;
+
+        const response = await adminFetch(url);
+        const data = await response.json();
+
+        if (data.code === 200) {
+          renderGiftCards(data.data.cards || data.data.giftcards || data.data.items || data.data.content || []);
+          renderPagination(data.data);
+        } else {
+          showToast(data.message || '加载兑换码失败', 'error');
+        }
+      } catch (error) {
+        console.error('加载兑换码失败:', error);
+        showToast('加载兑换码失败', 'error');
+      }
+    }
+
+    function renderGiftCards(giftcards) {
+      const tbody = document.getElementById('giftcardList');
+
+      if (!giftcards || giftcards.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="px-6 py-12 text-center text-gray-400">暂无兑换码</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = giftcards.map(card => {
+        const statusMap = {
+          0: { label: '可用', cls: 'bg-green-100 text-green-700', key: 'AVAILABLE' },
+          1: { label: '已售出', cls: 'bg-blue-100 text-blue-700', key: 'SOLD' },
+          2: { label: '已使用', cls: 'bg-gray-100 text-gray-600', key: 'USED' },
+          'AVAILABLE': { label: '可用', cls: 'bg-green-100 text-green-700', key: 'AVAILABLE' },
+          'SOLD': { label: '已售出', cls: 'bg-blue-100 text-blue-700', key: 'SOLD' },
+          'USED': { label: '已使用', cls: 'bg-gray-100 text-gray-600', key: 'USED' }
+        };
+        const statusInfo = statusMap[card.status] || { label: card.status || '未知', cls: 'bg-gray-100 text-gray-600', key: '' };
+        const productName = card.product
+          ? (card.product.nameZh || card.product.nameEn || card.product.name || getProductName(card.productId))
+          : getProductName(card.productId);
+        const createdAt = card.createdAt ? formatDateTime(card.createdAt) : '-';
+        const orderId = card.orderId || '-';
+        const cardCode = card.cardCode || card.code || '-';
+
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 text-sm text-gray-500">${card.id}</td>
+            <td class="px-6 py-4 text-sm text-gray-800 font-medium">${productName}</td>
+            <td class="px-6 py-4 text-sm text-gray-800 font-mono">${cardCode}</td>
+            <td class="px-6 py-4">
+              <span class="px-2 py-1 text-xs rounded-full ${statusInfo.cls}">${statusInfo.label}</span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-600">${orderId}</td>
+            <td class="px-6 py-4 text-sm text-gray-500">${createdAt}</td>
+            <td class="px-6 py-4">
+              ${card.status === 0 || card.status === 'AVAILABLE'
+                ? `<button onclick="deleteGiftCard(${card.id})" class="text-red-500 hover:text-red-700 text-sm">删除</button>`
+                : '<span class="text-gray-300 text-sm">-</span>'
+              }
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderPagination(data) {
+      const cards = data.cards || data.giftcards || data.items || data.content || [];
+      const total = data.total || data.totalElements || cards.length || 0;
+      const page = data.page || data.number + 1 || 1;
+      const pages = data.pages || data.totalPages || 1;
+
+      document.getElementById('paginationInfo').textContent = `共 ${total} 条，第 ${page}/${pages} 页`;
+
+      let html = '';
+      if (page > 1) {
+        html += `<button onclick="loadGiftCards(${page - 1})" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 text-sm">上一页</button>`;
+      }
+      if (page < pages) {
+        html += `<button onclick="loadGiftCards(${page + 1})" class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-50 text-sm">下一页</button>`;
+      }
+      document.getElementById('pagination').innerHTML = html;
+    }
+
+    // ========== 辅助函数 ==========
+    function getProductName(productId) {
+      const product = products.find(p => p.id === productId);
+      return product ? (product.nameZh || product.name || `商品 #${productId}`) : `商品 #${productId}`;
+    }
+
+    function formatDateTime(dateStr) {
+      try {
+        const date = new Date(dateStr);
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const h = String(date.getHours()).padStart(2, '0');
+        const min = String(date.getMinutes()).padStart(2, '0');
+        const s = String(date.getSeconds()).padStart(2, '0');
+        return `${y}-${m}-${d} ${h}:${min}:${s}`;
+      } catch (e) {
+        return dateStr;
+      }
+    }
+
+    // ========== 删除兑换码 ==========
+    async function deleteGiftCard(id) {
+      if (!confirm('确定要删除此兑换码吗？删除后不可恢复。')) return;
+
+      try {
+        const response = await adminFetch(`${API_BASE_URL}/admin/giftcards/${id}`, {
+          method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.code === 200) {
+          showToast('兑换码已删除', 'success');
+          loadGiftCards(currentPage);
+        } else {
+          showToast(data.message || '删除失败', 'error');
+        }
+      } catch (error) {
+        console.error('删除兑换码失败:', error);
+        showToast('网络错误', 'error');
+      }
+    }
+
+    // ========== 批量添加弹窗 ==========
+    function openBatchModal() {
+      document.getElementById('batchForm').reset();
+      // 重置为自动生成模式
+      toggleAddMode('auto');
+      // 重置为永久有效
+      toggleExpireMode('permanent');
+      document.getElementById('batchModal').classList.remove('hidden');
+    }
+
+    function closeBatchModal() {
+      document.getElementById('batchModal').classList.add('hidden');
+      document.getElementById('batchForm').reset();
+    }
+
+    // 切换有效期模式
+    function toggleExpireMode(mode) {
+      const expireAtInput = document.getElementById('batchExpireAt');
+      if (mode === 'permanent') {
+        expireAtInput.classList.add('hidden');
+        expireAtInput.value = '';
+      } else {
+        expireAtInput.classList.remove('hidden');
+        expireAtInput.required = true;
+      }
+    }
+
+    // 切换添加模式
+    function toggleAddMode(mode) {
+      const autoSection = document.getElementById('autoModeSection');
+      const manualSection = document.getElementById('manualModeSection');
+      const batchCount = document.getElementById('batchCount');
+      const batchCardCodes = document.getElementById('batchCardCodes');
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (mode === 'auto') {
+        autoSection.classList.remove('hidden');
+        manualSection.classList.add('hidden');
+        batchCount.required = true;
+        batchCardCodes.required = false;
+        submitBtn.textContent = '确认生成';
+      } else {
+        autoSection.classList.add('hidden');
+        manualSection.classList.remove('hidden');
+        batchCount.required = false;
+        batchCardCodes.required = true;
+        submitBtn.textContent = '确认添加';
+      }
+    }
+
+    document.getElementById('batchForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const productId = parseInt(document.getElementById('batchProduct').value);
+      const expireMode = document.querySelector('input[name="expireMode"]:checked').value;
+      const addMode = document.querySelector('input[name="addMode"]:checked').value;
+
+      if (!productId) {
+        showToast('请选择商品', 'warning');
+        return;
+      }
+
+      // 处理有效期
+      let expireAt = null;
+      if (expireMode === 'custom') {
+        const expireAtValue = document.getElementById('batchExpireAt').value;
+        if (!expireAtValue) {
+          showToast('请选择有效期', 'warning');
+          return;
+        }
+        expireAt = expireAtValue;
+      } else {
+        expireAt = 'permanent'; // 永久有效
+      }
+
+      let requestBody = { productId, expireAt };
+      let successMsg = '';
+
+      if (addMode === 'auto') {
+        // 自动生成模式
+        const count = parseInt(document.getElementById('batchCount').value);
+        if (!count || count < 1 || count > 1000) {
+          showToast('生成数量必须在 1-1000 之间', 'warning');
+          return;
+        }
+        requestBody.count = count;
+        successMsg = '生成';
+      } else {
+        // 手动填写模式
+        const codesText = document.getElementById('batchCardCodes').value;
+        if (!codesText.trim()) {
+          showToast('请输入兑换码', 'warning');
+          return;
+        }
+        // 解析兑换码（按行分割，去重，过滤空行）
+        const cardCodes = [...new Set(codesText.split('\n').map(c => c.trim()).filter(c => c))];
+        if (cardCodes.length === 0) {
+          showToast('请输入有效的兑换码', 'warning');
+          return;
+        }
+        if (cardCodes.length > 1000) {
+          showToast('单次最多添加 1000 个兑换码', 'warning');
+          return;
+        }
+        requestBody.cardCodes = cardCodes;
+        successMsg = '添加';
+      }
+
+      const btn = document.getElementById('submitBtn');
+      const originalText = btn.textContent;
+      btn.textContent = '处理中...';
+      btn.disabled = true;
+
+      try {
+        const response = await adminFetch(`${API_BASE_URL}/admin/giftcards/batch`, {
+          method: 'POST',
+          body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+
+        btn.textContent = originalText;
+        btn.disabled = false;
+
+        if (data.code === 200) {
+          const result = data.data;
+          if (result.failedCount > 0) {
+            let msg = `${successMsg}完成：成功 ${result.successCount} 个，失败 ${result.failedCount} 个`;
+            if (result.failedCodes && result.failedCodes.length > 0) {
+              msg += `（重复或无效: ${result.failedCodes.slice(0, 3).join(', ')}${result.failedCodes.length > 3 ? '...' : ''}）`;
+            }
+            showToast(msg, 'warning');
+          } else {
+            showToast(`成功${successMsg} ${result.successCount} 个兑换码`, 'success');
+          }
+          closeBatchModal();
+          loadGiftCards(1);
+        } else {
+          showToast(data.message || `${successMsg}失败`, 'error');
+        }
+      } catch (error) {
+        console.error('批量添加兑换码失败:', error);
+        showToast('网络错误', 'error');
+        btn.textContent = originalText;
+        btn.disabled = false;
+      }
+    });
+
+    // 点击弹窗背景关闭
+    document.getElementById('batchModal').addEventListener('click', (e) => {
+      if (e.target === e.currentTarget) {
+        closeBatchModal();
+      }
+    });
+
+    // ========== 初始化 ==========
+    document.addEventListener('DOMContentLoaded', async () => {
+      await checkAdminAuth();
+      loadProducts();
+      loadGiftCards();
+    });
+  </script>
+</body>
+</html>

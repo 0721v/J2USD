@@ -1,0 +1,1647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兰雀Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/common.css">
+  <style>
+    /* 页面切换动画 */
+    #content-area {
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    #content-area.loaded {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* 加载指示器 */
+    .loading-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #3b82f6, transparent);
+      transform: translateX(-100%);
+      z-index: 9999;
+    }
+    .loading-bar.active {
+      animation: loading 1s ease-in-out infinite;
+    }
+    @keyframes loading {
+      0% { transform: translateX(-100%); }
+      50% { transform: translateX(0%); }
+      100% { transform: translateX(100%); }
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  <!-- 加载条 -->
+  <div id="loadingBar" class="loading-bar"></div>
+
+  <!-- 顶部导航栏 -->
+  <nav id="navbar" class="fixed top-0 left-0 right-0 bg-white z-50 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <!-- Logo 区域（左侧） -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="router.navigate('index')">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="site-logo-container hidden"></div>
+        <span class="text-lg font-bold text-blue-500 site-name">礼品卡平台</span>
+      </div>
+
+      <!-- 导航链接（中间） -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="#" id="nav-home" class="nav-link text-blue-500 font-medium" data-page="index">首页</a>
+        <a href="#" id="nav-products" class="nav-link text-gray-600 hover:text-blue-500" data-page="products">商品</a>
+        <a href="#" id="nav-redeem" class="nav-link text-gray-600 hover:text-blue-500" data-page="redeem">查询</a>
+      </div>
+
+      <!-- 右侧：语言切换 -->
+      <div class="hidden md:flex items-center gap-1 text-sm">
+        <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+        <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+        <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+        <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+      </div>
+
+      <!-- 移动端汉堡菜单按钮 -->
+      <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+        <svg id="mobileMenuIcon" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 移动端展开菜单 -->
+    <div id="mobileMenu" class="md:hidden bg-white border-t border-gray-100 hidden">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#" class="nav-link block py-2 px-3 rounded-lg bg-blue-50 text-blue-500" data-page="index">首页</a>
+        <a href="#" class="nav-link block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" data-page="products">商品</a>
+        <a href="#" class="nav-link block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" data-page="redeem">查询</a>
+        <div class="pt-3 border-t border-gray-100 flex gap-4">
+          <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+          <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+          <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+          <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 内容区域 -->
+  <div id="content-area" class="pt-14 min-h-screen"></div>
+
+  <!-- 底部导航（移动端） -->
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 md:hidden">
+    <div class="flex items-center justify-around h-14">
+      <a href="#" class="nav-link flex flex-col items-center justify-center flex-1 h-full text-blue-500" data-page="index">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="text-xs font-medium">首页</span>
+      </a>
+      <a href="#" class="nav-link flex flex-col items-center justify-center flex-1 h-full text-gray-400" data-page="products">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <span class="text-xs font-medium">商品</span>
+      </a>
+      <a href="#" class="nav-link flex flex-col items-center justify-center flex-1 h-full text-gray-400" data-page="redeem">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+        </svg>
+        <span class="text-xs font-medium">查询</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="../assets/js/common.js"></script>
+  <script>
+    // 简单的 SPA 路由系统
+    const router = {
+      currentPage: null,
+      
+      // 页面配置
+      routes: {
+        'index': { title: '首页', init: initIndex },
+        'products': { title: '商品列表', init: initProducts },
+        'product': { title: '商品详情', init: initProduct },
+        'order': { title: '订单详情', init: initOrder },
+        'payment': { title: '支付', init: initPayment },
+        'redeem': { title: '查询卡密', init: initRedeem }
+      },
+      
+      // 导航到指定页面
+      navigate(page, params = {}) {
+        const route = this.routes[page];
+        if (!route) return;
+        
+        this.currentPage = page;
+        
+        // 显示加载条
+        document.getElementById('loadingBar').classList.add('active');
+        
+        // 更新导航激活状态
+        this.updateNavActive(page);
+        
+        // 更新浏览器历史
+        let url = `/pages/app.html?page=${page}`;
+        if (Object.keys(params).length > 0) {
+          const paramStr = Object.entries(params)
+            .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`)
+            .join('&');
+          url += '&' + paramStr;
+        }
+        history.pushState({ page, params }, route.title, url);
+        
+        // 加载页面内容
+        this.loadContent(page, params);
+      },
+      
+      // 加载页面内容
+      loadContent(page, params) {
+        const contentArea = document.getElementById('content-area');
+        const route = this.routes[page];
+        
+        // 淡出动画
+        contentArea.classList.remove('loaded');
+        
+        setTimeout(() => {
+          // 清空内容
+          contentArea.innerHTML = '';
+          
+          // 执行页面初始化函数
+          if (route.init) {
+            route.init(contentArea, params);
+          }
+          
+          // 隐藏加载条
+          document.getElementById('loadingBar').classList.remove('active');
+          
+          // 淡入动画
+          contentArea.classList.add('loaded');
+          
+          // 更新标题
+          document.title = route.title + ' - 兰雀Pro';
+          
+          // 滚动到顶部
+          window.scrollTo(0, 0);
+        }, 150);
+      },
+      
+      // 更新导航激活状态
+      updateNavActive(page) {
+        document.querySelectorAll('.nav-link').forEach(link => {
+          link.classList.remove('text-blue-500', 'active');
+          link.classList.add('text-gray-400', 'text-gray-600');
+          
+          const linkPage = link.getAttribute('data-page');
+          if (linkPage === page || (page === 'product' && linkPage === 'products')) {
+            link.classList.remove('text-gray-400', 'text-gray-600');
+            link.classList.add('text-blue-500', 'active');
+          }
+        });
+      }
+    };
+    
+    // 页面初始化函数
+    function initIndex(container, params) {
+      container.innerHTML = `
+        <section class="hero bg-gradient-to-br from-blue-500 to-blue-600 text-white py-16 md:py-24">
+          <div class="max-w-6xl mx-auto px-4 text-center">
+            <h1 class="text-3xl md:text-5xl font-bold mb-4">安全便捷的礼品卡发卡平台</h1>
+            <p class="text-lg md:text-xl text-blue-100 mb-8">支持多种支付方式，快速发货</p>
+            <button onclick="router.navigate('products')" class="bg-white text-blue-600 font-medium text-lg px-8 py-4 rounded-xl hover:bg-gray-100 transition-colors">立即开始</button>
+          </div>
+        </section>
+        
+        <section class="payment-methods py-12 bg-white">
+          <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">支持多种支付方式</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div class="card p-6 text-center">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h3 class="font-medium text-gray-800">微信支付</h3>
+              </div>
+              <div class="card p-6 text-center">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h3 class="font-medium text-gray-800">支付宝</h3>
+              </div>
+              <div class="card p-6 text-center">
+                <div class="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                </div>
+                <h3 class="font-medium text-gray-800">USDT (TRC20)</h3>
+              </div>
+              <div class="card p-6 text-center">
+                <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span class="text-2xl font-bold text-orange-600">OKX</span>
+                </div>
+                <h3 class="font-medium text-gray-800">OKX (TRC20)</h3>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+        <section class="how-to-buy py-12 bg-gray-50">
+          <div class="max-w-6xl mx-auto px-4">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">如何购买</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="text-center">
+                <div class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">1</div>
+                <h3 class="font-medium text-gray-800 mb-2">选择商品</h3>
+                <p class="text-gray-500 text-sm">浏览我们的商品列表</p>
+              </div>
+              <div class="text-center">
+                <div class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">2</div>
+                <h3 class="font-medium text-gray-800 mb-2">完成支付</h3>
+                <p class="text-gray-500 text-sm">选择您喜欢的支付方式</p>
+              </div>
+              <div class="text-center">
+                <div class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold">3</div>
+                <h3 class="font-medium text-gray-800 mb-2">获取卡密</h3>
+                <p class="text-gray-500 text-sm">在查询页面输入您填写的信息，即可获取您的礼品卡密</p>
+              </div>
+            </div>
+          </div>
+        </section>
+        
+      `;
+    }
+    
+    function initProducts(container, params) {
+      container.innerHTML = `
+        <div class="max-w-6xl mx-auto px-4 py-8">
+          <h1 class="text-2xl font-bold text-gray-800 mb-6">商品列表</h1>
+          <!-- 分类筛选 -->
+          <div id="category-tabs" class="flex flex-wrap gap-2 mb-6">
+            <button class="category-tab px-4 py-2 rounded-full text-sm font-medium bg-blue-500 text-white" data-category-id="all">全部</button>
+          </div>
+          <!-- 商品网格 -->
+          <div id="products-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="text-center py-20 text-gray-500 col-span-full">加载中...</div>
+          </div>
+        </div>
+      `;
+      
+      const lang = getCurrentLang();
+      
+      // 加载分类
+      fetch('/api/products/categories?lang=' + lang)
+        .then(r => r.json())
+        .then(data => {
+          const tabsContainer = document.getElementById('category-tabs');
+          if (!tabsContainer) return;
+          
+          if (data.code === 200 && data.data && data.data.categories) {
+            const categories = data.data.categories;
+            categories.forEach(cat => {
+              const btn = document.createElement('button');
+              btn.className = 'category-tab px-4 py-2 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors';
+              btn.setAttribute('data-category-id', cat.id);
+              btn.textContent = cat.nameZh || cat.nameEn || cat.name || ('分类' + cat.id);
+              tabsContainer.appendChild(btn);
+            });
+          }
+          
+          // 绑定分类点击事件
+          tabsContainer.querySelectorAll('.category-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+              // 更新激活状态
+              tabsContainer.querySelectorAll('.category-tab').forEach(t => {
+                t.classList.remove('bg-blue-500', 'text-white');
+                t.classList.add('bg-gray-100', 'text-gray-600');
+              });
+              tab.classList.remove('bg-gray-100', 'text-gray-600');
+              tab.classList.add('bg-blue-500', 'text-white');
+              
+              // 加载对应分类商品
+              const categoryId = tab.getAttribute('data-category-id');
+              loadProducts(categoryId, lang);
+            });
+          });
+        })
+        .catch(() => {});
+      
+      // 加载全部商品
+      loadProducts('all', lang);
+    }
+    
+    function loadProducts(categoryId, lang) {
+      const grid = document.getElementById('products-grid');
+      if (!grid) return;
+      grid.innerHTML = '<div class="text-center py-20 text-gray-500 col-span-full">加载中...</div>';
+      
+      let url = '/api/products?lang=' + lang;
+      if (categoryId && categoryId !== 'all') {
+        url += '&categoryId=' + categoryId;
+      }
+      
+      fetch(url)
+        .then(r => r.json())
+        .then(data => {
+          if (!document.getElementById('products-grid')) return;
+          const products = data.data && data.data.products ? data.data.products : (Array.isArray(data.data) ? data.data : []);
+          if (data.code === 200 && products.length > 0) {
+            grid.innerHTML = products.map(p => `
+              <div class="card bg-white rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-md transition-shadow" onclick="router.navigate('product', {id: ${p.id}})">
+                <img src="${p.imageUrl || '../assets/images/default-product.png'}" alt="${p.name}" class="w-full h-48 object-cover" onerror="this.src='../assets/images/default-product.png'">
+                <div class="p-4">
+                  <h3 class="font-medium text-gray-800 mb-2">${p.name}</h3>
+                  <p class="text-blue-600 font-bold">${p.currency || 'USD'} ${p.price}</p>
+                  <p class="text-gray-400 text-sm mt-1">库存: ${p.stockQuantity || 0}</p>
+                </div>
+              </div>
+            `).join('');
+          } else {
+            grid.innerHTML = '<div class="text-center py-20 text-gray-500 col-span-full">暂无商品</div>';
+          }
+        })
+        .catch(() => {
+          if (!document.getElementById('products-grid')) return;
+          grid.innerHTML = '<div class="text-center py-20 text-gray-500 col-span-full">加载失败</div>';
+        });
+    }
+    
+    function initProduct(container, params) {
+      const productId = params.id || 1;
+      const lang = getCurrentLang();
+      
+      container.innerHTML = `
+        <div class="max-w-2xl mx-auto px-4 py-8">
+          <div id="product-detail">
+            <div class="text-center py-20 text-gray-500">加载中...</div>
+          </div>
+        </div>
+      `;
+      
+      // 加载支付配置
+      let paymentStatus = { wechat: true, alipay: true, trc20: true, okx: true };
+      const paymentConfigPromise = fetch('/api/admin/payment-config/status')
+        .then(r => r.json())
+        .then(data => {
+          if (data.code === 200) paymentStatus = data.data;
+        })
+        .catch(() => {});
+      
+      // 加载商品详情
+      Promise.all([paymentConfigPromise, fetch('/api/products/' + productId + '?lang=' + lang).then(r => r.json())])
+        .then(([_, data]) => {
+          const detail = document.getElementById('product-detail');
+          if (!detail) return;
+          const p = data.data && data.data.product ? data.data.product : data.data;
+          if (data.code === 200 && p) {
+            const msg = getMessages();
+            const stock = p.stockQuantity || p.stock || 0;
+            const defaultImg = '../assets/images/default-product.png';
+            
+            detail.innerHTML = `
+              <!-- 商品图片 -->
+              <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+                <div class="aspect-square bg-gray-100">
+                  <img src="${p.imageUrl || defaultImg}" alt="${p.name}" class="w-full h-full object-cover" onerror="this.src='${defaultImg}'">
+                </div>
+              </div>
+              
+              <!-- 商品信息和下单表单 -->
+              <div class="bg-white rounded-xl shadow-sm p-6">
+                <h1 class="text-xl font-bold text-gray-800 mb-2">${p.name}</h1>
+                <p class="text-gray-500 mb-4">${p.description || ''}</p>
+                
+                <div class="flex items-center gap-4 mb-6">
+                  <span class="text-red-500 font-bold text-2xl">${p.currency || 'USD'} ${p.price}</span>
+                  <span class="text-gray-400 text-sm">${msg.product.stock || '库存'}: ${stock}</span>
+                </div>
+                
+                <!-- 邮箱 -->
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">${msg.order.email || '邮箱'}</label>
+                  <input type="email" id="emailInput" placeholder="${msg.order.emailPlaceholder || '请输入接收兑换码的邮箱'}" 
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                </div>
+                
+                <!-- 查询密码 -->
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-2">${msg.order.queryPassword || '查询密码'}</label>
+                  <input type="password" id="queryPasswordInput" placeholder="${msg.order.queryPasswordPlaceholder || '请设置查询密码（用于查询卡密）'}" 
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+                  <p class="text-xs text-gray-500 mt-1">${msg.order.queryPasswordTip || '支付成功后，可使用邮箱和此密码查询您的卡密'}</p>
+                </div>
+                
+                <!-- 支付方式 -->
+                <div class="mb-6">
+                  <label class="block text-sm font-medium text-gray-700 mb-3">${msg.order.paymentMethod || '支付方式'}</label>
+                  <div class="space-y-2" id="paymentOptions">
+                    ${renderPaymentOptionsHTML(msg, paymentStatus)}
+                  </div>
+                </div>
+                
+                <!-- 立即购买按钮 -->
+                <button id="createOrderBtn" onclick="createOrder(${p.id}, ${p.price}, '${p.currency || 'USD'}', ${stock})" ${stock === 0 ? 'disabled' : ''}
+                  class="w-full py-3 rounded-lg font-medium transition-all ${stock === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}">
+                  ${stock === 0 ? (msg.product.outOfStock || '暂时缺货') : (msg.order.createOrder || '立即购买')}
+                </button>
+              </div>
+            `;
+            
+            // 保存商品信息到全局变量
+            window.currentProduct = p;
+            window.currentQuantity = 1;
+            // 注意：selectedPayment 已在 renderPaymentOptionsHTML 中设置，不要覆盖
+          }
+        })
+        .catch(() => {
+          const detail = document.getElementById('product-detail');
+          if (!detail) return;
+          detail.innerHTML = '<div class="text-center py-20 text-gray-500">加载失败</div>';
+        });
+    }
+    
+    // 渲染支付方式HTML
+    function renderPaymentOptionsHTML(msg, paymentStatus) {
+      const methods = [
+        { key: 'wechat', icon: '微', iconClass: 'bg-green-100 text-green-600', label: msg.order.wechat || '微信支付' },
+        { key: 'alipay', icon: '支', iconClass: 'bg-blue-100 text-blue-600', label: msg.order.alipay || '支付宝' },
+        { key: 'trc20', icon: 'U', iconClass: 'bg-purple-100 text-purple-600', label: msg.order.trc20 || 'USDT (TRC20)' },
+        { key: 'okx', icon: 'O', iconClass: 'bg-orange-100 text-orange-600', label: 'OKX（TRC20）' }
+      ];
+      
+      let html = '';
+      let first = true;
+      methods.forEach(method => {
+        if (paymentStatus[method.key]) {
+          const checked = first ? 'checked' : '';
+          const borderClass = first ? 'border-blue-500 bg-blue-50' : 'border-gray-200';
+          if (first) {
+            window.selectedPayment = method.key;
+            first = false;
+          }
+          html += `
+            <label class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${borderClass} hover:border-gray-300" onclick="selectPayment('${method.key}', this)">
+              <input type="radio" name="payment" value="${method.key}" ${checked} class="hidden">
+              <div class="w-10 h-10 rounded-full ${method.iconClass.split(' ')[0]} flex items-center justify-center">
+                <span class="${method.iconClass.split(' ')[1]} font-bold text-lg">${method.icon}</span>
+              </div>
+              <span class="text-gray-700 font-medium">${method.label}</span>
+            </label>
+          `;
+        }
+      });
+      
+      // 钱包地址展示区域
+      html += '<div id="walletAddressInfo" class="hidden mt-2 p-3 bg-purple-50 rounded-lg border border-purple-200">';
+      html += '  <p class="text-xs text-purple-600 font-medium mb-1">收款地址</p>';
+      html += '  <p id="walletAddressText" class="text-sm font-mono text-purple-800 break-all select-all">-</p>';
+      html += '</div>';
+      
+      return html || '<p class="text-gray-500 text-sm">暂无可用支付方式</p>';
+    }
+    
+    // 选择支付方式
+    function selectPayment(method, labelEl) {
+      window.selectedPayment = method;
+      document.querySelectorAll('#paymentOptions label').forEach(el => {
+        el.classList.remove('border-blue-500', 'bg-blue-50');
+        el.classList.add('border-gray-200');
+      });
+      labelEl.classList.remove('border-gray-200');
+      labelEl.classList.add('border-blue-500', 'bg-blue-50');
+      
+      // 显示/隐藏钱包地址
+      const walletInfo = document.getElementById('walletAddressInfo');
+      if (method === 'trc20') {
+        walletInfo.classList.remove('hidden');
+        if (!window.trc20WalletAddress) {
+          // 加载 TRC20 配置获取钱包地址
+          fetch('/api/admin/payment-config/trc20/public')
+            .then(r => r.json())
+            .then(data => {
+              if (data.code === 200 && data.data && data.data.wallet_address) {
+                window.trc20WalletAddress = data.data.wallet_address;
+                document.getElementById('walletAddressText').textContent = data.data.wallet_address;
+              } else {
+                document.getElementById('walletAddressText').textContent = '未配置收款地址';
+              }
+            })
+            .catch(() => {
+              document.getElementById('walletAddressText').textContent = '加载失败';
+            });
+        } else {
+          document.getElementById('walletAddressText').textContent = window.trc20WalletAddress;
+        }
+      } else if (method === 'okx') {
+        walletInfo.classList.remove('hidden');
+        if (!window.okxWalletAddress) {
+          // 加载 OKX 配置获取钱包地址
+          fetch('/api/admin/payment-config/okx/public')
+            .then(r => r.json())
+            .then(data => {
+              if (data.code === 200 && data.data && data.data.okx_wallet_address) {
+                window.okxWalletAddress = data.data.okx_wallet_address;
+                document.getElementById('walletAddressText').textContent = data.data.okx_wallet_address;
+              } else {
+                document.getElementById('walletAddressText').textContent = '未配置收款地址';
+              }
+            })
+            .catch(() => {
+              document.getElementById('walletAddressText').textContent = '加载失败';
+            });
+        } else {
+          document.getElementById('walletAddressText').textContent = window.okxWalletAddress;
+        }
+      } else {
+        walletInfo.classList.add('hidden');
+      }
+    }
+    
+    // 更新数量
+    function updateQuantity(delta, stock) {
+      const qtyEl = document.getElementById('quantity');
+      if (!qtyEl) return;
+      let qty = parseInt(qtyEl.textContent) + delta;
+      qty = Math.max(1, Math.min(qty, stock || 99));
+      qtyEl.textContent = qty;
+      window.currentQuantity = qty;
+    }
+    
+    // 创建订单
+    async function createOrder(productId, price, currency, stock) {
+      const email = document.getElementById('emailInput')?.value;
+      const queryPassword = document.getElementById('queryPasswordInput')?.value;
+      const quantity = window.currentQuantity || 1;
+      
+      if (!email || !email.includes('@')) {
+        showToast('请填写有效的邮箱地址', 'error');
+        return;
+      }
+      if (!queryPassword || queryPassword.length < 6) {
+        showToast('查询密码至少需要6位', 'error');
+        return;
+      }
+      
+      // 禁用按钮防止重复提交
+      const btn = document.querySelector('#createOrderBtn');
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = '创建中...';
+      }
+      
+      try {
+        const response = await fetch('/api/orders?lang=' + getCurrentLang(), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productId: productId,
+            quantity: quantity,
+            paymentMethod: window.selectedPayment || 'wechat',
+            email: email,
+            queryPassword: queryPassword
+          })
+        });
+        
+        const data = await response.json();
+        console.log('创建订单响应:', data);
+        if (data.code === 200 && data.data && data.data.success) {
+          // 添加 createdAt 到订单数据（用于倒计时）
+          const orderData = data.data;
+          if (!orderData.createdAt) {
+            orderData.createdAt = new Date().toISOString();
+          }
+          // 跳转到支付页面
+          const orderStr = encodeURIComponent(JSON.stringify(orderData));
+          router.navigate('payment', { order: orderStr });
+        } else {
+          const msg = data.message || data.error || '创建订单失败，请稍后重试';
+          console.error('创建订单失败:', data);
+          showToast(msg, 'error');
+        }
+      } catch (error) {
+        console.error('创建订单失败:', error);
+        showToast('网络错误，请重试', 'error');
+      } finally {
+        // 恢复按钮
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = '创建订单';
+        }
+      }
+    }
+    
+    // Toast 提示
+    function showToast(message, type = 'info') {
+      // 移除已有的 toast
+      const existing = document.querySelector('.app-toast');
+      if (existing) existing.remove();
+      
+      const toast = document.createElement('div');
+      const bgColor = type === 'error' ? 'bg-red-500' : type === 'success' ? 'bg-green-500' : 'bg-blue-500';
+      toast.className = `app-toast fixed top-4 left-1/2 -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 text-sm font-medium`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+    
+    function initOrder(container, params) {
+      container.innerHTML = `
+        <div class="max-w-md mx-auto px-4 py-8">
+          <h1 class="text-2xl font-bold text-gray-800 mb-6">确认订单</h1>
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <p class="text-gray-500 mb-4">订单功能开发中...</p>
+            <button onclick="router.navigate('products')" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors">返回商品列表</button>
+          </div>
+        </div>
+      `;
+    }
+    
+    async function initPayment(container, params) {
+      const orderStr = params.order ? decodeURIComponent(params.order) : null;
+      const order = orderStr ? JSON.parse(orderStr) : null;
+      
+      if (!order) {
+        container.innerHTML = `
+          <div class="max-w-md mx-auto px-4 py-8">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6">支付</h1>
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <p class="text-gray-500 mb-4">订单信息不存在</p>
+              <button onclick="router.navigate('products')" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors">返回商品列表</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      const isTrc20 = order.paymentMethod === 'trc20';
+      const isOkx = order.paymentMethod === 'okx';
+
+      // 兼容两种数据格式：扁平 (address) 或嵌套 (paymentData.address)
+      const getAddress = () => order.paymentData?.address || order.address || '';
+      const getAmount = () => order.paymentData?.amount || order.amount || order.totalAmount || '';
+
+      container.innerHTML = `
+        <div class="max-w-md mx-auto px-4 py-8">
+          <h1 class="text-2xl font-bold text-gray-800 mb-6">支付</h1>
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <!-- 订单信息 -->
+            <div class="mb-6 pb-6 border-b border-gray-100">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">订单号</span>
+                <span class="font-mono text-sm text-gray-800">${order.orderNo || order.id}</span>
+              </div>
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-gray-500">支付金额</span>
+                <span class="text-xl font-bold text-red-500">${order.currency || 'USD'} ${order.totalAmount || order.amount}</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-gray-500">支付方式</span>
+                <span class="text-gray-800">${getPaymentMethodName(order.paymentMethod)}</span>
+              </div>
+            </div>
+            
+            ${isTrc20 ? `
+            <!-- TRC20 支付信息 -->
+            <div class="mb-6">
+              <div class="bg-purple-50 rounded-lg p-4 mb-4">
+                <p class="text-sm text-purple-700 mb-2">USDT (TRC20) 转账信息</p>
+                <div class="mb-3">
+                  <p class="text-xs text-purple-500 mb-1">收款地址</p>
+                  <p class="text-sm font-mono text-purple-800 break-all select-all bg-white p-2 rounded">${getAddress() || '加载中...'}</p>
+                </div>
+                <div class="mb-3">
+                  <p class="text-xs text-purple-500 mb-1">转账金额</p>
+                  <p class="text-lg font-bold text-purple-800">${getAmount()} USDT</p>
+                </div>
+              </div>
+              
+              <!-- 重要提示：订单号备注 -->
+              <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start gap-2">
+                  <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-yellow-800 mb-1">重要提示</p>
+                    <p class="text-sm text-yellow-700">转账时请务必在备注/附言中填写订单号：</p>
+                    <p class="text-lg font-mono font-bold text-yellow-800 mt-1 select-all">${order.orderNo || order.id}</p>
+                    <p class="text-xs text-yellow-600 mt-2">* 正确填写备注可加快到账确认速度</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 欧易交易所推荐 -->
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start gap-2">
+                  <svg class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-blue-800 mb-1">${getMessages().payment.okxRecommend}</p>
+                    <p class="text-sm text-blue-700 mb-2">${getMessages().payment.okxDesc}</p>
+                    <a href="https://www.okx.com" target="_blank" class="inline-flex items-center text-sm text-blue-600 hover:text-blue-800 font-medium">
+                      <span>${getMessages().payment.okxLink}</span>
+                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 转账步骤 -->
+              <div class="space-y-3 text-sm text-gray-600">
+                <div class="flex gap-3">
+                  <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                  <p>${getMessages().payment.step1}</p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                  <p>${getMessages().payment.step2.replace('{amount}', getAmount())}</p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                  <p>${getMessages().payment.step3.replace('{orderNo}', order.orderNo || order.id)}</p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                  <p>${getMessages().payment.step4}</p>
+                </div>
+              </div>
+            </div>
+            ` : isOkx ? `
+            <!-- OKX 支付信息 -->
+            <div class="mb-6">
+              <div class="bg-orange-50 rounded-lg p-4 mb-4">
+                <p class="text-sm text-orange-700 mb-2 font-medium">OKX USDT 转账信息</p>
+                <div class="mb-3">
+                  <p class="text-xs text-orange-500 mb-1">${getMessages().payment.okxAddress}</p>
+                  <p class="text-sm font-mono text-orange-800 break-all select-all bg-white p-2 rounded">${getAddress() || '加载中...'}</p>
+                </div>
+                <div class="mb-3">
+                  <p class="text-xs text-orange-500 mb-1">${getMessages().payment.okxAmount}</p>
+                  <p class="text-lg font-bold text-orange-800">${getAmount()} USDT</p>
+                </div>
+              </div>
+              
+              <!-- 重要提示：订单号备注 -->
+              <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start gap-2">
+                  <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-yellow-800 mb-1">重要提示</p>
+                    <p class="text-sm text-yellow-700">转账时请务必在备注/附言中填写订单号：</p>
+                    <p class="text-lg font-mono font-bold text-yellow-800 mt-1 select-all">${order.orderNo || order.id}</p>
+                    <p class="text-xs text-yellow-600 mt-2">* 正确填写备注可加快到账确认速度</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- OKX 转账引导 -->
+              <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
+                <div class="flex items-start gap-2">
+                  <svg class="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
+                  <div>
+                    <p class="text-sm font-medium text-orange-800 mb-1">${getMessages().payment.okx}</p>
+                    <p class="text-sm text-orange-700 mb-2">${getMessages().payment.okxDesc}</p>
+                    <a href="https://www.okx.com" target="_blank" class="inline-flex items-center text-sm text-orange-600 hover:text-orange-800 font-medium">
+                      <span>${getMessages().payment.okxLink}</span>
+                      <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- 转账步骤 -->
+              <div class="space-y-3 text-sm text-gray-600">
+                <div class="flex gap-3">
+                  <span class="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold flex-shrink-0">1</span>
+                  <p>${getMessages().payment.okxStep1}</p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold flex-shrink-0">2</span>
+                  <p>${getMessages().payment.okxStep2}</p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold flex-shrink-0">3</span>
+                  <p>${getMessages().payment.okxStep3.replace('{amount}', getAmount())}</p>
+                </div>
+                <div class="flex gap-3">
+                  <span class="w-6 h-6 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs font-bold flex-shrink-0">4</span>
+                  <p>${getMessages().payment.okxStep4}</p>
+                </div>
+              </div>
+            </div>
+            ` : `
+            <!-- 其他支付方式 -->
+            <div class="mb-6">
+              <p class="text-gray-500 text-center py-8">${getPaymentMethodName(order.paymentMethod)} 支付正在开发中...</p>
+            </div>
+            `}
+            
+            <!-- 倒计时 -->
+            <div class="mb-6 text-center">
+              <p class="text-sm text-gray-500 mb-1">支付剩余时间</p>
+              <p id="countdown" class="text-2xl font-mono font-bold text-gray-800">30:00</p>
+            </div>
+            
+            <!-- 输入交易哈希 -->
+            <div class="mb-6">
+              <button onclick="showTxIdDialog('${order.orderNo}')" 
+                class="w-full bg-white border border-gray-300 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"></path>
+                </svg>
+                <span>输入交易哈希（TXID）</span>
+              </button>
+              <p class="text-xs text-gray-500 text-center mt-2">如果您有交易哈希，可手动提交加速确认</p>
+            </div>
+            
+            <!-- 重新选择支付方式 -->
+            <div class="mb-6 pt-6 border-t border-gray-100">
+              <p class="text-sm text-gray-500 mb-3">切换支付方式</p>
+              <div class="grid grid-cols-3 gap-3" id="paymentSwitch">
+                <!-- 支付方式按钮将由JS动态生成 -->
+              </div>
+            </div>
+            
+            <button onclick="router.navigate('index')" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors mb-6">返回首页</button>
+            
+            <!-- 支付状态显示 -->
+            <div id="paymentStatusArea" class="mb-6 hidden">
+              <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <div id="paymentStatusIcon" class="mb-2">
+                  <svg class="w-8 h-8 text-blue-500 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </div>
+                <p id="paymentStatusText" class="text-sm text-gray-600">正在查询支付状态...</p>
+              </div>
+            </div>
+            
+            <!-- 我已支付按钮 - 放在最下方 -->
+            <div class="mb-4">
+              <button id="confirmPaymentBtn" onclick="confirmPayment('${order.orderNo}')" 
+                class="w-full bg-green-500 text-white py-3 rounded-lg font-medium hover:bg-green-600 transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>我已支付</span>
+              </button>
+              <p class="text-xs text-gray-500 text-center mt-2">点击后系统将自动查询支付状态</p>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 启动倒计时 - 从订单创建时间计算剩余时间
+      const orderExpireMinutes = 30; // 订单有效期30分钟
+      let expireAt = Date.now() + orderExpireMinutes * 60 * 1000; // 默认值
+      
+      if (order.createdAt) {
+        // 从创建时间计算过期时间
+        const createdAt = new Date(order.createdAt).getTime();
+        expireAt = createdAt + orderExpireMinutes * 60 * 1000;
+      } else if (order.orderNo) {
+        // 从后端获取订单信息
+        try {
+          const response = await fetch(`/api/orders/${order.orderNo}?lang=${getCurrentLang()}`);
+          const data = await response.json();
+          if (data.code === 200 && data.data && data.data.createdAt) {
+            const createdAt = new Date(data.data.createdAt).getTime();
+            expireAt = createdAt + orderExpireMinutes * 60 * 1000;
+            // 更新 order 对象
+            order.createdAt = data.data.createdAt;
+          }
+        } catch (e) {
+          console.error('获取订单信息失败:', e);
+        }
+      }
+      
+      startCountdown(expireAt);
+      
+      // 加载支付方式切换按钮
+      loadPaymentSwitch(order);
+    }
+    
+    function getPaymentMethodName(method) {
+      const names = {
+        'wechat': '微信支付',
+        'alipay': '支付宝',
+        'trc20': 'USDT (TRC20)',
+        'okx': 'OKX（TRC20）'
+      };
+      return names[method] || method || '未知支付方式';
+    }
+    
+    function startCountdown(expireAt) {
+      const countdownEl = document.getElementById('countdown');
+      if (!countdownEl) return;
+      
+      const update = () => {
+        const now = Date.now();
+        const diff = expireAt - now;
+        if (diff <= 0) {
+          countdownEl.textContent = '00:00';
+          countdownEl.classList.add('text-red-500');
+          return;
+        }
+        const mins = Math.floor(diff / 60000);
+        const secs = Math.floor((diff % 60000) / 1000);
+        countdownEl.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      };
+      
+      update();
+      setInterval(update, 1000);
+    }
+    
+    // 加载支付方式切换按钮
+    async function loadPaymentSwitch(order) {
+      const switchContainer = document.getElementById('paymentSwitch');
+      if (!switchContainer) return;
+      
+      try {
+        const response = await fetch('/api/admin/payment-config/status');
+        const data = await response.json();
+        
+        if (data.code !== 200) {
+          switchContainer.innerHTML = '<p class="text-sm text-gray-400">加载支付方式失败</p>';
+          return;
+        }
+        
+        const status = data.data;
+        const methods = [];
+        
+        if (status.wechat) methods.push({ key: 'wechat', name: '微信支付', icon: '💚' });
+        if (status.alipay) methods.push({ key: 'alipay', name: '支付宝', icon: '💙' });
+        if (status.trc20) methods.push({ key: 'trc20', name: 'USDT', icon: '💜' });
+        if (status.okx) methods.push({ key: 'okx', name: 'OKX（TRC20）', icon: '🔶' });
+        
+        if (methods.length === 0) {
+          switchContainer.innerHTML = '<p class="text-sm text-gray-400">暂无其他支付方式</p>';
+          return;
+        }
+        
+        switchContainer.innerHTML = methods.map(method => {
+          const isCurrent = order.paymentMethod === method.key;
+          const bgClass = isCurrent ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200';
+          const disabledAttr = isCurrent ? 'disabled' : '';
+          return `
+            <button onclick="switchPaymentMethod('${order.orderNo}', '${method.key}')" 
+              ${disabledAttr}
+              class="flex flex-col items-center justify-center p-3 rounded-lg ${bgClass} transition-colors ${isCurrent ? 'cursor-default' : 'cursor-pointer'}">
+              <span class="text-xl mb-1">${method.icon}</span>
+              <span class="text-xs">${method.name}</span>
+            </button>
+          `;
+        }).join('');
+      } catch (error) {
+        console.error('加载支付方式失败:', error);
+        switchContainer.innerHTML = '<p class="text-sm text-gray-400">加载失败</p>';
+      }
+    }
+    
+    // 切换支付方式
+    async function switchPaymentMethod(orderNo, newPaymentMethod) {
+      try {
+        showToast('正在切换支付方式...', 'info');
+        
+        const response = await fetch(`/api/orders/${orderNo}/switch-payment`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentMethod: newPaymentMethod })
+        });
+        
+        const data = await response.json();
+        
+        if (data.code === 200 && data.data) {
+          showToast('支付方式已切换', 'success');
+          // 重新加载支付页面
+          const orderStr = encodeURIComponent(JSON.stringify(data.data));
+          router.navigate('payment', { order: orderStr });
+        } else {
+          showToast(data.message || '切换失败', 'error');
+        }
+      } catch (error) {
+        console.error('切换支付方式失败:', error);
+        showToast('网络错误，请重试', 'error');
+      }
+    }
+    
+    // 全局查询分页状态
+    let queryPageState = { email: '', password: '', page: 1, totalPages: 1, total: 0 };
+
+    // 全局分页查询函数
+    async function fetchQueryPage(page) {
+      try {
+        queryPageState.page = page;
+        const response = await fetch(`/api/orders/query-by-email?page=${page}&size=5`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: queryPageState.email, queryPassword: queryPageState.password })
+        });
+        
+        const data = await response.json();
+        console.log('查询响应:', data);
+        
+        if (data.code === 200) {
+          queryPageState.totalPages = data.data.totalPages || 1;
+          queryPageState.total = data.data.total || 0;
+          renderQueryResults(data);
+        } else {
+          showToast(data.message || '查询失败，请检查邮箱和查询密码', 'error');
+        }
+      } catch (error) {
+        console.error('查询失败:', error);
+        showToast('网络错误，请稍后重试', 'error');
+      }
+    }
+
+    function initRedeem(container, params) {
+      container.innerHTML = `
+        <div class="max-w-md mx-auto px-4 py-8">
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <div class="text-center mb-6">
+              <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+              </div>
+              <h2 class="text-xl font-bold text-gray-800">查询卡密</h2>
+              <p class="text-gray-500 text-sm mt-2">输入邮箱和查询密码查看您的卡密</p>
+            </div>
+            
+            <form id="queryForm">
+              <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">邮箱</label>
+                <input type="email" id="queryEmail" placeholder="请输入购买时填写的邮箱" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+              </div>
+              <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">查询密码</label>
+                <input type="password" id="queryPassword" placeholder="请输入购买时设置的查询密码" class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50">
+              </div>
+              <button type="submit" class="w-full bg-blue-500 text-white py-3 rounded-lg font-medium hover:bg-blue-600 transition-colors">查询</button>
+            </form>
+            
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+              <h4 class="font-medium text-gray-700 mb-2">使用说明</h4>
+              <ul class="text-sm text-gray-500 space-y-1">
+                <li>• 请使用购买时填写的邮箱</li>
+                <li>• 查询密码为购买时设置的密码</li>
+                <li>• 仅显示已支付完成的订单</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 当前查询分页状态
+      // queryPageState 已提升到全局作用域
+
+      document.getElementById('queryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById('queryEmail').value.trim();
+        const queryPassword = document.getElementById('queryPassword').value.trim();
+        
+        if (!email) {
+          alert('请输入邮箱');
+          return;
+        }
+        if (!queryPassword) {
+          alert('请输入查询密码');
+          return;
+        }
+        
+        // 保存查询条件，重置到第1页
+        queryPageState = { email, password: queryPassword, page: 1, totalPages: 1, total: 0 };
+        
+        await fetchQueryPage(1);
+      });
+    }
+    
+    // 渲染查询结果
+    function renderQueryResults(result) {
+      console.log('renderQueryResults 接收数据:', result);
+      const container = document.getElementById('content-area');
+      if (!container) {
+        console.error('找不到 content-area 容器');
+        showToast('页面加载错误，请刷新重试', 'error');
+        return;
+      }
+      // 兼容两种数据结构：result.orders 或 result.data.orders
+      const orders = result.orders || (result.data && result.data.orders) || [];
+      console.log('解析到的订单:', orders);
+      
+      if (orders.length === 0) {
+        container.innerHTML = `
+          <div class="max-w-md mx-auto px-4 py-8">
+            <div class="bg-white rounded-xl shadow-sm p-6">
+              <div class="text-center py-8">
+                <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-800 mb-2">未找到订单</h3>
+                <p class="text-gray-500">没有找到符合条件的订单，请检查邮箱和查询密码</p>
+              </div>
+              <button onclick="router.navigate('redeem')" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors">重新查询</button>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      let html = `
+        <div class="max-w-md mx-auto px-4 py-8">
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-2">查询结果</h2>
+            <p class="text-gray-500 text-sm mb-6">共找到 ${queryPageState.total} 个订单</p>
+            
+            <div class="space-y-4">
+      `;
+      
+      orders.forEach(order => {
+        const statusMap = {
+          0: { label: '待支付', cls: 'bg-yellow-100 text-yellow-700' },
+          1: { label: '已支付', cls: 'bg-blue-100 text-blue-700' },
+          2: { label: '处理中', cls: 'bg-blue-100 text-blue-700' },
+          3: { label: '已完成', cls: 'bg-green-100 text-green-700' },
+          4: { label: '已取消', cls: 'bg-gray-100 text-gray-600' }
+        };
+        const statusInfo = statusMap[order.status] || { label: '未知', cls: 'bg-gray-100 text-gray-600' };
+        
+        html += `
+          <div class="border border-gray-200 rounded-lg p-4">
+            <div class="flex justify-between items-start mb-3">
+              <div>
+                <p class="text-sm text-gray-500">订单号</p>
+                <p class="font-mono text-sm text-gray-800">${order.orderNo}</p>
+              </div>
+              <span class="px-2 py-1 text-xs rounded-full ${statusInfo.cls}">${statusInfo.label}</span>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-3">
+              <div>
+                <p class="text-sm text-gray-500">商品</p>
+                <p class="text-sm text-gray-800">${order.productName || '商品 #' + order.productId}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">金额</p>
+                <p class="text-sm text-gray-800">${order.currency} ${order.totalAmount}</p>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mb-3">
+              <div>
+                <p class="text-sm text-gray-500">支付方式</p>
+                <p class="text-sm text-gray-800">${getPaymentMethodName(order.paymentMethod)}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-500">创建时间</p>
+                <p class="text-sm text-gray-800">${order.createdAt ? new Date(order.createdAt).toLocaleString('zh-CN') : '-'}</p>
+              </div>
+            </div>
+            
+            ${order.status === 3 && order.giftCards ? `
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <p class="text-sm font-medium text-gray-700 mb-2">兑换码</p>
+              <div class="space-y-2">
+                ${order.giftCards.map(card => `
+                  <div class="bg-gray-50 p-3 rounded-lg">
+                    <p class="text-sm font-mono text-gray-800 select-all">${card.cardCode || card.code}</p>
+                    <p class="text-xs text-gray-500 mt-1">状态: ${card.status === 2 ? '已使用' : '未使用'}</p>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+            ` : ''}
+            
+            ${order.status === 0 ? `
+            <div class="mt-3 pt-3 border-t border-gray-100">
+              <button onclick="continuePayment('${order.orderNo}', ${order.productId}, ${order.totalAmount}, '${order.currency || 'USD'}', '${order.paymentMethod || 'wechat'}')" 
+                class="w-full bg-blue-500 text-white py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+                继续支付
+              </button>
+            </div>
+            ` : ''}
+          </div>
+        `;
+      });
+      
+      html += `
+            </div>
+            
+            ${queryPageState.totalPages > 1 ? `
+            <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
+              <button onclick="fetchQueryPage(${queryPageState.page - 1})" 
+                ${queryPageState.page <= 1 ? 'disabled' : ''}
+                class="px-4 py-2 text-sm rounded-lg ${queryPageState.page <= 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'} transition-colors">
+                上一页
+              </button>
+              <span class="text-sm text-gray-600">${queryPageState.page} / ${queryPageState.totalPages}</span>
+              <button onclick="fetchQueryPage(${queryPageState.page + 1})" 
+                ${queryPageState.page >= queryPageState.totalPages ? 'disabled' : ''}
+                class="px-4 py-2 text-sm rounded-lg ${queryPageState.page >= queryPageState.totalPages ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'} transition-colors">
+                下一页
+              </button>
+            </div>
+            ` : ''}
+            
+            <button onclick="router.navigate('redeem')" class="w-full mt-4 bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors">重新查询</button>
+          </div>
+        </div>
+      `;
+      
+      container.innerHTML = html;
+    }
+    
+    // 继续支付
+    async function continuePayment(orderNo, productId, amount, currency, paymentMethod) {
+      try {
+        // 显示加载提示
+        showToast('正在获取支付信息...', 'info');
+        
+        // 从后端获取完整的支付信息
+        const response = await fetch(`/api/orders/${orderNo}/payment-info?lang=zh`);
+        const data = await response.json();
+        
+        if (data.code === 200 && data.data) {
+          // 构造支付页面所需的数据
+          const paymentData = {
+            orderNo: orderNo,
+            amount: amount,
+            totalAmount: amount,
+            currency: currency,
+            productId: productId,
+            paymentMethod: paymentMethod,
+            paymentData: data.data,
+            success: true
+          };
+          
+          // 跳转到支付页面
+          const orderStr = encodeURIComponent(JSON.stringify(paymentData));
+          router.navigate('payment', { order: orderStr });
+        } else {
+          // 如果获取支付信息失败，使用基本信息跳转
+          const paymentData = {
+            orderNo: orderNo,
+            amount: amount,
+            totalAmount: amount,
+            currency: currency,
+            productId: productId,
+            paymentMethod: paymentMethod,
+            success: true
+          };
+          const orderStr = encodeURIComponent(JSON.stringify(paymentData));
+          router.navigate('payment', { order: orderStr });
+        }
+      } catch (error) {
+        console.error('继续支付失败:', error);
+        showToast('网络错误，请重试', 'error');
+      }
+    }
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', () => {
+      // 加载网站设置
+      loadSiteSettings().then(() => {
+        applySiteSettings();
+      });
+      
+      // 更新导航文字
+      const msg = getMessages();
+      document.getElementById('nav-home').textContent = msg.nav.home;
+      document.getElementById('nav-products').textContent = msg.nav.products;
+      document.getElementById('nav-redeem').textContent = msg.nav.redeem;
+      
+      // 绑定导航点击事件
+      document.querySelectorAll('.nav-link[data-page]').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const page = link.getAttribute('data-page');
+          router.navigate(page);
+        });
+      });
+      
+      // 监听浏览器前进后退
+      window.addEventListener('popstate', (e) => {
+        if (e.state && e.state.page) {
+          router.currentPage = e.state.page;
+          router.updateNavActive(e.state.page);
+          router.loadContent(e.state.page, e.state.params || {});
+        }
+      });
+      
+      // 加载默认页面
+      const urlParams = new URLSearchParams(window.location.search);
+      const page = urlParams.get('page') || 'index';
+      const params = {};
+      urlParams.forEach((value, key) => {
+        if (key !== 'page') params[key] = value;
+      });
+      router.navigate(page, params);
+    });
+    
+    // 显示 TXID 输入弹窗
+    function showTxIdDialog(orderNo) {
+      // 创建弹窗
+      const overlay = document.createElement('div');
+      overlay.id = 'txidOverlay';
+      overlay.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+      overlay.innerHTML = `
+        <div class="bg-white rounded-xl p-6 mx-4 max-w-md w-full shadow-2xl">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">输入交易哈希（TXID）</h3>
+          <p class="text-sm text-gray-500 mb-4">请在您的钱包或交易所中找到交易哈希并粘贴到下方</p>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">交易哈希</label>
+            <input type="text" id="txIdInput" 
+              placeholder="例如: 1234567890abcdef..."
+              class="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none font-mono"
+              oninput="this.value = this.value.trim()">
+            <p class="text-xs text-gray-400 mt-1">交易哈希通常为 64 位十六进制字符串</p>
+          </div>
+          
+          <div id="txidError" class="hidden mb-4 bg-red-50 border border-red-200 rounded-lg p-3">
+            <p class="text-sm text-red-600" id="txidErrorText"></p>
+          </div>
+          
+          <div id="txidLoading" class="hidden mb-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-blue-500 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p class="text-sm text-blue-600">正在验证交易...</p>
+            </div>
+          </div>
+          
+          <div class="flex gap-3">
+            <button onclick="closeTxIdDialog()" 
+              class="flex-1 bg-gray-100 text-gray-700 py-2.5 rounded-lg font-medium hover:bg-gray-200 transition-colors">
+              取消
+            </button>
+            <button id="txidSubmitBtn" onclick="submitTxId('${orderNo}')" 
+              class="flex-1 bg-blue-500 text-white py-2.5 rounded-lg font-medium hover:bg-blue-600 transition-colors">
+              提交验证
+            </button>
+          </div>
+        </div>
+      `;
+      
+      document.body.appendChild(overlay);
+      
+      // 点击遮罩关闭
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeTxIdDialog();
+      });
+      
+      // 聚焦输入框
+      setTimeout(() => {
+        document.getElementById('txIdInput').focus();
+      }, 100);
+    }
+    
+    // 关闭 TXID 弹窗
+    function closeTxIdDialog() {
+      const overlay = document.getElementById('txidOverlay');
+      if (overlay) overlay.remove();
+    }
+    
+    // 提交 TXID 验证
+    async function submitTxId(orderNo) {
+      const txId = document.getElementById('txIdInput').value.trim();
+      const errorDiv = document.getElementById('txidError');
+      const errorText = document.getElementById('txidErrorText');
+      const loadingDiv = document.getElementById('txidLoading');
+      const submitBtn = document.getElementById('txidSubmitBtn');
+      
+      // 验证输入
+      if (!txId) {
+        errorDiv.classList.remove('hidden');
+        errorText.textContent = '请输入交易哈希';
+        return;
+      }
+      
+      if (txId.length < 10) {
+        errorDiv.classList.remove('hidden');
+        errorText.textContent = '交易哈希格式不正确，请检查';
+        return;
+      }
+      
+      // 隐藏错误，显示加载
+      errorDiv.classList.add('hidden');
+      loadingDiv.classList.remove('hidden');
+      submitBtn.disabled = true;
+      submitBtn.classList.add('opacity-50');
+      
+      try {
+        const response = await fetch(`/api/orders/${orderNo}/confirm-by-txid?lang=${getCurrentLang()}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ txId: txId })
+        });
+        
+        const data = await response.json();
+        
+        if (data.code === 200 && data.data && data.data.success) {
+          // 支付确认成功
+          closeTxIdDialog();
+          showToast('支付确认成功！', 'success');
+          
+          // 更新状态显示
+          const statusArea = document.getElementById('paymentStatusArea');
+          const statusText = document.getElementById('paymentStatusText');
+          const statusIcon = document.getElementById('paymentStatusIcon');
+          
+          if (statusArea && statusText && statusIcon) {
+            statusArea.classList.remove('hidden');
+            statusText.textContent = '支付成功！正在跳转...';
+            statusText.classList.add('text-green-600', 'font-medium');
+            statusIcon.innerHTML = `
+              <svg class="w-8 h-8 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            `;
+          }
+          
+          // 禁用按钮
+          if (document.getElementById('confirmPaymentBtn')) {
+            document.getElementById('confirmPaymentBtn').disabled = true;
+            document.getElementById('confirmPaymentBtn').classList.add('opacity-50');
+          }
+          
+          // 跳转到查询页面
+          setTimeout(() => {
+            router.navigate('redeem');
+          }, 2000);
+        } else {
+          // 验证失败
+          loadingDiv.classList.add('hidden');
+          errorDiv.classList.remove('hidden');
+          errorText.textContent = data.message || '交易验证失败，请检查交易哈希是否正确';
+          submitBtn.disabled = false;
+          submitBtn.classList.remove('opacity-50');
+        }
+      } catch (error) {
+        console.error('提交 TXID 失败:', error);
+        loadingDiv.classList.add('hidden');
+        errorDiv.classList.remove('hidden');
+        errorText.textContent = '网络错误，请稍后重试';
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('opacity-50');
+      }
+    }
+    
+    // 确认支付 - 开始轮询查询支付状态
+    let paymentCheckInterval = null;
+    let paymentCheckCount = 0;
+    let paymentSuccess = false; // 标记是否已支付成功，防止重复刷新
+    const maxPaymentCheckCount = 60; // 最多查询60次（约5分钟）
+    
+    async function confirmPayment(orderNo) {
+      const statusArea = document.getElementById('paymentStatusArea');
+      const statusText = document.getElementById('paymentStatusText');
+      const statusIcon = document.getElementById('paymentStatusIcon');
+      const confirmBtn = document.getElementById('confirmPaymentBtn');
+      
+      if (!statusArea || !statusText) return;
+      
+      // 显示状态区域
+      statusArea.classList.remove('hidden');
+      statusText.textContent = '正在查询支付状态...';
+      
+      // 禁用按钮
+      if (confirmBtn) {
+        confirmBtn.disabled = true;
+        confirmBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      }
+      
+      // 清除之前的轮询
+      if (paymentCheckInterval) {
+        clearInterval(paymentCheckInterval);
+      }
+      
+      paymentCheckCount = 0;
+      
+      // 立即查询一次
+      await checkPaymentStatus(orderNo, statusText, statusIcon, confirmBtn);
+      
+      // 开始轮询（每5秒查询一次）
+      paymentCheckInterval = setInterval(async () => {
+        paymentCheckCount++;
+        if (paymentCheckCount >= maxPaymentCheckCount) {
+          clearInterval(paymentCheckInterval);
+          statusText.textContent = '查询超时，请稍后手动查询订单状态';
+          if (confirmBtn) {
+            confirmBtn.disabled = false;
+            confirmBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            confirmBtn.innerHTML = `
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
+              <span>重新查询</span>
+            `;
+          }
+          return;
+        }
+        await checkPaymentStatus(orderNo, statusText, statusIcon, confirmBtn);
+      }, 5000);
+    }
+    
+    async function checkPaymentStatus(orderNo, statusText, statusIcon, confirmBtn) {
+      // 如果已经支付成功，不再重复处理
+      if (paymentSuccess) return;
+
+      try {
+        // 先调用确认支付 API
+        const confirmResponse = await fetch(`/api/orders/${orderNo}/confirm-payment?lang=${getCurrentLang()}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const confirmData = await confirmResponse.json();
+        
+        if (confirmData.code === 200 && confirmData.data && confirmData.data.success) {
+          // 标记已成功，防止重复处理
+          paymentSuccess = true;
+          clearInterval(paymentCheckInterval);
+          
+          // 支付确认成功
+          statusText.textContent = '支付成功！';
+          statusText.classList.add('text-green-600', 'font-medium');
+          statusIcon.innerHTML = `
+            <svg class="w-8 h-8 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          `;
+          
+          // 弹窗提示后跳转
+          alert('支付成功！点击确定跳转到订单查询页面。');
+          router.navigate('redeem');
+          return;
+        }
+        
+        // 如果确认失败，查询订单状态
+        const response = await fetch(`/api/orders/${orderNo}?lang=${getCurrentLang()}`);
+        const data = await response.json();
+        
+        if (data.code === 200 && data.data) {
+          const order = data.data;
+          
+          if (order.status >= 2) {
+            // 标记已成功，防止重复处理
+            paymentSuccess = true;
+            clearInterval(paymentCheckInterval);
+            
+            // 支付成功
+            statusText.textContent = '支付成功！';
+            statusText.classList.add('text-green-600', 'font-medium');
+            statusIcon.innerHTML = `
+              <svg class="w-8 h-8 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            `;
+            
+            // 弹窗提示后跳转
+            alert('支付成功！点击确定跳转到订单查询页面。');
+            router.navigate('redeem');
+          } else if (order.status === 1) {
+            // 已支付但未完成
+            statusText.textContent = '支付已确认，正在处理...';
+          } else {
+            // 待支付
+            statusText.textContent = `正在查询支付状态...（${paymentCheckCount + 1}/${maxPaymentCheckCount}）`;
+          }
+        }
+      } catch (error) {
+        console.error('查询支付状态失败:', error);
+        statusText.textContent = '查询失败，正在重试...';
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>兰雀Pro</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../assets/css/common.css">
+</head>
+<body class="page-container">
+  <nav id="navbar" class="fixed top-0 left-0 right-0 bg-white z-50">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+      <!-- Logo 区域（左侧） -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div class="site-logo-container hidden"></div>
+        <span class="text-lg font-bold text-blue-500 site-name">礼品卡平台</span>
+      </div>
+
+      <!-- 导航链接（中间） -->
+      <div class="hidden md:flex items-center gap-6">
+        <a href="#" id="nav-home" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/index.html')">首页</a>
+        <a href="#" id="nav-products" class="text-blue-500 font-medium" onclick="navigateTo('pages/products.html')">商品</a>
+        <a href="#" id="nav-redeem" class="text-gray-600 hover:text-blue-500" onclick="navigateTo('pages/redeem.html')">查询</a>
+      </div>
+
+      <!-- 右侧：语言切换 -->
+      <div class="hidden md:flex items-center gap-1 text-sm">
+        <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+        <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+        <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+        <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+      </div>
+
+      <!-- 移动端汉堡菜单按钮 -->
+      <button class="md:hidden p-2" onclick="toggleMobileMenu()">
+        <svg id="mobileMenuIcon" class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+      </button>
+    </div>
+
+    <!-- 移动端展开菜单 -->
+    <div id="mobileMenu" class="md:hidden bg-white border-t border-gray-100 hidden">
+      <div class="px-4 py-3 space-y-2">
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/index.html'); toggleMobileMenu()">首页</a>
+        <a href="#" class="block py-2 px-3 rounded-lg bg-blue-50 text-blue-500" onclick="navigateTo('pages/products.html'); toggleMobileMenu()">商品</a>
+        <a href="#" class="block py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-600" onclick="navigateTo('pages/redeem.html'); toggleMobileMenu()">查询</a>
+        <div class="pt-3 border-t border-gray-100 flex gap-4">
+          <button onclick="setLang('zh')" class="text-gray-400 hover:text-gray-600">中</button>
+          <button onclick="setLang('en')" class="text-gray-400 hover:text-gray-600">En</button>
+          <button onclick="setLang('ja')" class="text-gray-400 hover:text-gray-600">日</button>
+          <button onclick="setLang('ko')" class="text-gray-400 hover:text-gray-600">한</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="max-w-2xl mx-auto px-4 pt-20 pb-24 md:pb-20">
+    <div id="productDetail">
+      <div id="loading" class="flex justify-center py-12">
+        <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50 md:hidden">
+    <div class="flex items-center justify-around h-14">
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/index.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+        </svg>
+        <span class="text-xs font-medium">首页</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-blue-500" onclick="navigateTo('pages/products.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+        </svg>
+        <span class="text-xs font-medium">商品</span>
+      </a>
+      <a href="#" class="flex flex-col items-center justify-center flex-1 h-full text-gray-400" onclick="navigateTo('pages/redeem.html')">
+        <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="text-xs font-medium">查询</span>
+      </a>
+    </div>
+  </nav>
+
+  <script src="../assets/js/common.js"></script>
+  <script>
+    const API_BASE_URL = '/api';
+    let product = null;
+    let quantity = 1;
+    let selectedPayment = 'okx';
+    let paymentStatus = { wechat: true, alipay: true, trc20: true, okx: true }; // 默认都启用
+
+    // 加载支付配置状态
+    async function loadPaymentStatus() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/admin/payment-config/status`);
+        const data = await response.json();
+        if (data.code === 200) {
+          paymentStatus = data.data;
+          // 如果默认选中的支付方式被禁用，选择第一个启用的
+          if (!paymentStatus[selectedPayment]) {
+            if (paymentStatus.okx) selectedPayment = 'okx';
+            else if (paymentStatus.trc20) selectedPayment = 'trc20';
+            else if (paymentStatus.alipay) selectedPayment = 'alipay';
+            else if (paymentStatus.wechat) selectedPayment = 'wechat';
+          }
+        }
+      } catch (error) {
+        console.error('加载支付配置失败:', error);
+      }
+    }
+
+    // 加载商品详情
+    async function loadProduct() {
+      // 先加载支付配置
+      await loadPaymentStatus();
+      const urlParams = new URLSearchParams(window.location.search);
+      const productId = urlParams.get('id');
+      const lang = urlParams.get('lang') || getCurrentLang();
+
+      if (!productId) {
+        navigateTo('pages/products.html');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/products/${productId}?lang=${lang}`);
+        const data = await response.json();
+
+        if (data.code === 200) {
+          product = data.data;
+          product.id = parseInt(productId);
+          renderProduct();
+        } else {
+          alert('商品不存在');
+          navigateTo('pages/products.html');
+        }
+      } catch (error) {
+        console.error('加载商品失败:', error);
+        alert('加载失败，请检查后端服务');
+        navigateTo('pages/products.html');
+      }
+    }
+
+    function renderProduct() {
+      const container = document.getElementById('productDetail');
+      const loading = document.getElementById('loading');
+      const msg = getMessages();
+      
+      loading.style.display = 'none';
+      
+      const name = product.name || '商品';
+      const description = product.description || '';
+      const price = product.price;
+      const currency = product.currency || 'CNY';
+      const stock = product.stock || product.stockQuantity || 0;
+      const imageUrl = product.imageUrl;
+      const defaultImg = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' fill='none'%3E%3Crect width='400' height='400' fill='%23f3f4f6'/%3E%3Cpath d='M170 140h60v60h-60z' fill='%23d1d5db'/%3E%3Cpath d='M130 230l40-40 30 30 40-50 60 60v10H130v-10z' fill='%239ca3af'/%3E%3Ccircle cx='200' cy='110' r='12' fill='%239ca3af'/%3E%3C/svg%3E";
+      
+      container.innerHTML = `
+        <div class="card bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+          <div class="aspect-square bg-gray-100">
+            <img src="${imageUrl || defaultImg}" alt="${name}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='${defaultImg}'" />
+          </div>
+        </div>
+
+        <div class="card bg-white rounded-xl shadow-sm p-6">
+          <h1 class="text-xl font-bold text-gray-800 mb-2">${name}</h1>
+          <p class="text-gray-500 mb-4">${description}</p>
+          
+          <div class="flex items-center gap-4 mb-4">
+            <span class="text-red-500 font-bold text-2xl">${currency} ${price}</span>
+            <span class="text-gray-400 text-sm">${msg.product.stock}: ${stock}</span>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">${msg.order.quantity}</label>
+            <div class="flex items-center gap-3">
+              <button onclick="quantity = Math.max(1, quantity - 1); updateTotal()"
+                class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                </svg>
+              </button>
+              <span id="quantity" class="w-12 text-center text-lg font-medium">${quantity}</span>
+              <button onclick="quantity = Math.min(${stock}, quantity + 1); updateTotal()"
+                ${stock <= quantity ? 'disabled' : ''}
+                class="w-10 h-10 rounded-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-50">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center mb-6 p-4 bg-gray-50 rounded-lg">
+            <span class="text-gray-600">${msg.order.total}</span>
+            <span id="totalAmount" class="text-red-500 font-bold text-xl">${currency} ${(price * quantity).toFixed(2)}</span>
+          </div>
+
+          <div class="mb-6" id="paymentMethods">
+            <label class="block text-sm font-medium text-gray-700 mb-3">${msg.order.paymentMethod}</label>
+            <div class="space-y-2" id="paymentOptions">
+              <!-- 支付方式将动态生成 -->
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">${msg.order.email}</label>
+            <input type="email" id="emailInput" placeholder="请输入接收兑换码的邮箱"
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">查询密码</label>
+            <input type="password" id="queryPasswordInput" placeholder="请设置查询密码（用于查询卡密）"
+              class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/50" />
+            <p class="text-xs text-gray-500 mt-1">支付成功后，可使用邮箱和此密码查询您的卡密</p>
+          </div>
+
+          <div id="submitArea">
+            <button onclick="createOrder()" ${stock === 0 ? 'disabled' : ''}
+              class="w-full py-3 rounded-lg font-medium transition-all ${stock === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}">
+              ${stock === 0 ? msg.product.outOfStock : msg.order.createOrder}
+            </button>
+          </div>
+        </div>
+      `;
+      
+      // 渲染支付方式
+      renderPaymentOptions(msg);
+    }
+    
+    // 渲染支付方式选项
+    function renderPaymentOptions(msg) {
+      const paymentContainer = document.getElementById('paymentOptions');
+      if (!paymentContainer) return;
+      
+      const paymentMethods = [
+        { key: 'wechat', icon: '微', iconClass: 'bg-green-100 text-green-600', label: msg.order.wechat },
+        { key: 'alipay', icon: '支', iconClass: 'bg-blue-100 text-blue-600', label: msg.order.alipay },
+        { key: 'trc20', icon: 'U', iconClass: 'bg-purple-100 text-purple-600', label: msg.order.trc20 },
+        { key: 'okx', icon: 'O', iconClass: 'bg-orange-100 text-orange-600', label: 'OKX（TRC20）' }
+      ];
+      
+      let html = '';
+      let hasEnabled = false;
+      
+      paymentMethods.forEach((method, index) => {
+        if (paymentStatus[method.key]) {
+          hasEnabled = true;
+          const isSelected = selectedPayment === method.key;
+          const isChecked = index === 0 || isSelected ? 'checked' : '';
+          if (isChecked && !isSelected) selectedPayment = method.key;
+          
+          html += `
+            <label class="flex items-center gap-3 p-3 rounded-lg border cursor-pointer ${isSelected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'}">
+              <input type="radio" name="payment" value="${method.key}" ${isChecked} onclick="selectedPayment = '${method.key}'; renderPaymentOptions(getMessages());" />
+              <div class="w-10 h-10 rounded-full ${method.iconClass.split(' ')[0]} flex items-center justify-center">
+                <span class="${method.iconClass.split(' ')[1]} font-bold text-lg">${method.icon}</span>
+              </div>
+              <span class="text-gray-700 font-medium">${method.label}</span>
+            </label>
+          `;
+        }
+      });
+      
+      if (!hasEnabled) {
+        html = '<p class="text-gray-500 text-sm">暂无可用支付方式</p>';
+      }
+      
+      paymentContainer.innerHTML = html;
+    }
+
+    function updateTotal() {
+      document.getElementById('quantity').textContent = quantity;
+      const currency = product.currency || 'CNY';
+      const price = product.price;
+      document.getElementById('totalAmount').textContent = `${currency} ${(price * quantity).toFixed(2)}`;
+    }
+
+    // 创建订单
+    async function createOrder() {
+      const email = document.getElementById('emailInput').value;
+      const queryPassword = document.getElementById('queryPasswordInput').value;
+      
+      if (!email) {
+        alert('请填写邮箱地址');
+        return;
+      }
+
+      if (!email.includes('@')) {
+        alert('请填写有效的邮箱地址');
+        return;
+      }
+
+      if (!queryPassword) {
+        alert('请设置查询密码');
+        return;
+      }
+
+      if (queryPassword.length < 6) {
+        alert('查询密码至少需要6位');
+        return;
+      }
+
+      // 显示加载状态
+      const submitArea = document.getElementById('submitArea');
+      submitArea.innerHTML = `
+        <button disabled class="w-full py-3 rounded-lg font-medium bg-blue-300 text-white flex items-center justify-center gap-2">
+          <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          创建订单中...
+        </button>
+      `;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/orders?lang=${getCurrentLang()}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            productId: product.id,
+            quantity: quantity,
+            paymentMethod: selectedPayment,
+            email: email,
+            queryPassword: queryPassword
+          })
+        });
+
+        const data = await response.json();
+
+        if (data.code === 200) {
+          // 订单创建成功，跳转到支付页面
+          const orderStr = encodeURIComponent(JSON.stringify(data.data));
+          const lang = getCurrentLang();
+          navigateTo(`pages/payment.html?order=${orderStr}&lang=${lang}`);
+        } else {
+          alert(data.message || '创建订单失败');
+          renderProduct(); // 恢复按钮
+        }
+      } catch (error) {
+        console.error('创建订单失败:', error);
+        alert('网络错误，请检查后端服务是否启动');
+        renderProduct(); // 恢复按钮
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadSiteSettings().then(() => {
+        applySiteSettings();
+      });
+      loadProduct();
+
+      // 添加页面加载完成动画
+      setTimeout(() => {
+        document.body.classList.add('loaded');
+      }, 50);
+    });
+  </script>
+</body>
+</html>
