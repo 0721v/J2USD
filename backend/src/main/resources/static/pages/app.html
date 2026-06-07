@@ -692,6 +692,7 @@
       
       const isTrc20 = order.paymentMethod === 'trc20';
       const isOkx = order.paymentMethod === 'okx';
+      const isFree = parseFloat(order.totalAmount || order.amount || 0) === 0;
 
       // 兼容两种数据格式：扁平 (address) 或嵌套 (paymentData.address)
       const getAddress = () => order.paymentData?.address || order.address || '';
@@ -709,7 +710,7 @@
               </div>
               <div class="flex justify-between items-center mb-2">
                 <span class="text-gray-500">支付金额</span>
-                <span class="text-xl font-bold text-red-500">${order.currency || 'USD'} ${order.totalAmount || order.amount}</span>
+                <span class="text-xl font-bold ${isFree ? 'text-green-500' : 'text-red-500'}">${order.currency || 'USD'} ${order.totalAmount || order.amount}</span>
               </div>
               <div class="flex justify-between items-center">
                 <span class="text-gray-500">支付方式</span>
@@ -717,7 +718,18 @@
               </div>
             </div>
             
-            ${isTrc20 ? `
+            ${isFree ? `
+            <!-- 免费订单提示 -->
+            <div class="mb-6">
+              <div class="bg-green-50 rounded-lg p-4 mb-4 text-center">
+                <svg class="w-12 h-12 text-green-500 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <p class="text-green-700 font-medium">本订单无需支付</p>
+                <p class="text-sm text-green-600 mt-1">点击下方按钮即可确认订单</p>
+              </div>
+            </div>
+            ` : isTrc20 ? `
             <!-- TRC20 支付信息 -->
             <div class="mb-6">
               <div class="bg-purple-50 rounded-lg p-4 mb-4">
@@ -801,21 +813,6 @@
                 </div>
               </div>
               
-              <!-- 重要提示：订单号备注 -->
-              <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                <div class="flex items-start gap-2">
-                  <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
-                  </svg>
-                  <div>
-                    <p class="text-sm font-medium text-yellow-800 mb-1">重要提示</p>
-                    <p class="text-sm text-yellow-700">转账时请务必在备注/附言中填写订单号：</p>
-                    <p class="text-lg font-mono font-bold text-yellow-800 mt-1 select-all">${order.orderNo || order.id}</p>
-                    <p class="text-xs text-yellow-600 mt-2">* 正确填写备注可加快到账确认速度</p>
-                  </div>
-                </div>
-              </div>
-              
               <!-- OKX 转账引导 -->
               <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
                 <div class="flex items-start gap-2">
@@ -862,6 +859,7 @@
             </div>
             `}
             
+            ${!isFree ? `
             <!-- 倒计时 -->
             <div class="mb-6 text-center">
               <p class="text-sm text-gray-500 mb-1">支付剩余时间</p>
@@ -887,6 +885,7 @@
                 <!-- 支付方式按钮将由JS动态生成 -->
               </div>
             </div>
+            ` : ''}
             
             <button onclick="router.navigate('index')" class="w-full bg-gray-200 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-300 transition-colors mb-6">返回首页</button>
             
@@ -910,42 +909,44 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
-                <span>我已支付</span>
+                <span>${isFree ? '确认订单' : '我已支付'}</span>
               </button>
-              <p class="text-xs text-gray-500 text-center mt-2">点击后系统将自动查询支付状态</p>
+              <p class="text-xs text-gray-500 text-center mt-2">${isFree ? '点击后系统将立即确认订单' : '点击后系统将自动查询支付状态'}</p>
             </div>
           </div>
         </div>
       `;
       
-      // 启动倒计时 - 从订单创建时间计算剩余时间
-      const orderExpireMinutes = 30; // 订单有效期30分钟
-      let expireAt = Date.now() + orderExpireMinutes * 60 * 1000; // 默认值
-      
-      if (order.createdAt) {
-        // 从创建时间计算过期时间
-        const createdAt = new Date(order.createdAt).getTime();
-        expireAt = createdAt + orderExpireMinutes * 60 * 1000;
-      } else if (order.orderNo) {
-        // 从后端获取订单信息
-        try {
-          const response = await fetch(`/api/orders/${order.orderNo}?lang=${getCurrentLang()}`);
-          const data = await response.json();
-          if (data.code === 200 && data.data && data.data.createdAt) {
-            const createdAt = new Date(data.data.createdAt).getTime();
-            expireAt = createdAt + orderExpireMinutes * 60 * 1000;
-            // 更新 order 对象
-            order.createdAt = data.data.createdAt;
+      if (!isFree) {
+        // 启动倒计时 - 从订单创建时间计算剩余时间
+        const orderExpireMinutes = 30; // 订单有效期30分钟
+        let expireAt = Date.now() + orderExpireMinutes * 60 * 1000; // 默认值
+        
+        if (order.createdAt) {
+          // 从创建时间计算过期时间
+          const createdAt = new Date(order.createdAt).getTime();
+          expireAt = createdAt + orderExpireMinutes * 60 * 1000;
+        } else if (order.orderNo) {
+          // 从后端获取订单信息
+          try {
+            const response = await fetch(`/api/orders/${order.orderNo}?lang=${getCurrentLang()}`);
+            const data = await response.json();
+            if (data.code === 200 && data.data && data.data.createdAt) {
+              const createdAt = new Date(data.data.createdAt).getTime();
+              expireAt = createdAt + orderExpireMinutes * 60 * 1000;
+              // 更新 order 对象
+              order.createdAt = data.data.createdAt;
+            }
+          } catch (e) {
+            console.error('获取订单信息失败:', e);
           }
-        } catch (e) {
-          console.error('获取订单信息失败:', e);
         }
+        
+        startCountdown(expireAt);
+        
+        // 加载支付方式切换按钮
+        loadPaymentSwitch(order);
       }
-      
-      startCountdown(expireAt);
-      
-      // 加载支付方式切换按钮
-      loadPaymentSwitch(order);
     }
     
     function getPaymentMethodName(method) {
@@ -1599,9 +1600,21 @@
             </svg>
           `;
           
-          // 弹窗提示后跳转
-          alert('支付成功！点击确定跳转到订单查询页面。');
-          router.navigate('redeem');
+          // 获取订单详情并展示卡密
+          fetch(`/api/orders/${orderNo}?lang=${getCurrentLang()}`)
+            .then(res => res.json())
+            .then(data => {
+              if (data.code === 200 && data.data) {
+                showGiftCardsModal(data.data);
+              } else {
+                alert('支付成功！点击确定跳转到订单查询页面。');
+                router.navigate('redeem');
+              }
+            })
+            .catch(() => {
+              alert('支付成功！点击确定跳转到订单查询页面。');
+              router.navigate('redeem');
+            });
           return;
         }
         
@@ -1626,9 +1639,21 @@
               </svg>
             `;
             
-            // 弹窗提示后跳转
-            alert('支付成功！点击确定跳转到订单查询页面。');
-            router.navigate('redeem');
+            // 获取订单详情并展示卡密
+            fetch(`/api/orders/${orderNo}?lang=${getCurrentLang()}`)
+              .then(res => res.json())
+              .then(data => {
+                if (data.code === 200 && data.data) {
+                  showGiftCardsModal(data.data);
+                } else {
+                  alert('支付成功！点击确定跳转到订单查询页面。');
+                  router.navigate('redeem');
+                }
+              })
+              .catch(() => {
+                alert('支付成功！点击确定跳转到订单查询页面。');
+                router.navigate('redeem');
+              });
           } else if (order.status === 1) {
             // 已支付但未完成
             statusText.textContent = '支付已确认，正在处理...';
@@ -1641,6 +1666,77 @@
         console.error('查询支付状态失败:', error);
         statusText.textContent = '查询失败，正在重试...';
       }
+    }
+    
+    // 显示卡密弹窗
+    function showGiftCardsModal(order) {
+      const cards = order.cards || [];
+      if (cards.length === 0) {
+        alert('支付成功！点击确定跳转到订单查询页面。');
+        router.navigate('redeem');
+        return;
+      }
+      
+      let cardsHtml = '';
+      cards.forEach((card, index) => {
+        cardsHtml += `
+          <div class="bg-green-50 rounded-lg p-4 mb-3">
+            <div class="flex justify-between items-center mb-2">
+              <span class="text-sm text-gray-500">卡密 ${index + 1}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <code class="flex-1 bg-white px-3 py-2 rounded border font-mono text-sm break-all">${card.cardCode}</code>
+              <button onclick="copyCardCode('${card.cardCode}')" class="px-3 py-2 bg-blue-500 text-white rounded-lg text-sm hover:bg-blue-600 shrink-0">复制</button>
+            </div>
+          </div>
+        `;
+      });
+      
+      const modalHtml = `
+        <div id="giftCardsModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-[9999]">
+          <div class="bg-white rounded-xl shadow-xl max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="p-6">
+              <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800">支付成功</h3>
+                <button onclick="closeGiftCardsModal()" class="text-gray-400 hover:text-gray-600">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                  </svg>
+                </button>
+              </div>
+              <p class="text-green-600 font-medium mb-4">您的订单已支付成功，以下是您的卡密：</p>
+              <div class="space-y-2">${cardsHtml}</div>
+              <button onclick="closeGiftCardsModal()" class="w-full mt-4 py-3 bg-blue-500 text-white rounded-lg font-medium hover:bg-blue-600">
+                完成
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    
+    function copyCardCode(code) {
+      navigator.clipboard.writeText(code).then(() => {
+        alert('卡密已复制到剪贴板');
+      }).catch(() => {
+        const input = document.createElement('input');
+        input.value = code;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        document.body.removeChild(input);
+        alert('卡密已复制到剪贴板');
+      });
+    }
+    
+    function closeGiftCardsModal() {
+      const modal = document.getElementById('giftCardsModal');
+      if (modal) {
+        modal.remove();
+      }
+      router.navigate('redeem');
     }
   </script>
 </body>

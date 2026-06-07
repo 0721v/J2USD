@@ -518,7 +518,7 @@ async function loadSiteSettings() {
   if (cached) {
     _siteSettings = JSON.parse(cached);
   }
-  return _siteSettings || { site_name: '礼品卡发卡平台', site_logo: '' };
+  return _siteSettings || { site_name: '兰雀Pro', site_logo: '' };
 }
 
 // 获取网站设置（同步，优先用缓存）
@@ -529,7 +529,7 @@ function getSiteSettings() {
     _siteSettings = JSON.parse(cached);
     return _siteSettings;
   }
-  return { site_name: '礼品卡发卡平台', site_logo: '' };
+  return { site_name: '兰雀Pro', site_logo: '' };
 }
 
 // 获取当前语言的网站名称
@@ -538,7 +538,7 @@ function getSiteName(lang) {
   if (lang && settings['site_name_' + lang]) {
     return settings['site_name_' + lang];
   }
-  return settings.site_name || '礼品卡发卡平台';
+  return settings.site_name || '兰雀Pro';
 }
 
 // 获取网站 Logo URL

@@ -367,6 +367,36 @@ public class OrderServiceImpl implements OrderService {
             return result;
         }
         
+        // 安全验证：从数据库商品价格重新计算，确保订单价格未被篡改
+        Product product = productMapper.selectById(order.getProductId());
+        if (product == null) {
+            result.put("success", false);
+            result.put("message", "商品信息不存在");
+            return result;
+        }
+        BigDecimal expectedAmount = product.getPrice().multiply(new BigDecimal(order.getQuantity()));
+        if (order.getTotalAmount().compareTo(expectedAmount) != 0) {
+            result.put("success", false);
+            result.put("message", "订单价格异常，请重新下单");
+            return result;
+        }
+        
+        // 价格为0时直接支付成功
+        if (order.getTotalAmount() != null && order.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) == 0) {
+            boolean success = handlePaymentSuccess(orderNo, "FREE");
+            if (success) {
+                result.put("success", true);
+                result.put("message", "支付确认成功");
+                result.put("orderNo", orderNo);
+                result.put("status", 2); // 已完成
+                result.put("trxId", "FREE");
+            } else {
+                result.put("success", false);
+                result.put("message", "支付确认失败，请稍后重试");
+            }
+            return result;
+        }
+        
         // 对于 TRC20 支付，查询区块链验证交易
         if ("trc20".equals(order.getPaymentMethod())) {
             // 获取 TRC20 支付服务
@@ -541,6 +571,18 @@ public class OrderServiceImpl implements OrderService {
                 System.out.println("[OrderService] 订单 " + order.getOrderNo() + " 已过期，标记为取消");
                 order.setStatus(4); // 已取消
                 orderMapper.updateById(order);
+            }
+
+            // 0元订单自动完成支付
+            if (order.getStatus() != null && order.getStatus() == 0
+                    && order.getTotalAmount() != null
+                    && order.getTotalAmount().compareTo(java.math.BigDecimal.ZERO) == 0) {
+                System.out.println("[OrderService] 订单 " + order.getOrderNo() + " 为0元订单，自动完成支付");
+                boolean success = handlePaymentSuccess(order.getOrderNo(), "FREE");
+                if (success) {
+                    order.setStatus(3); // 已完成
+                    order.setPaymentStatus(1); // 已支付
+                }
             }
 
             // 获取每个订单的兑换码（仅已完成的订单）
