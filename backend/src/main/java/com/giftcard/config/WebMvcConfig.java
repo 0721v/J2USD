@@ -12,8 +12,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         // 设置首页
         registry.addViewController("/").setViewName("forward:/index.html");
         
-        // /admin 自动跳转到登录页
-        registry.addRedirectViewController("/admin", "/admin/login.html");
+        // /admin 转发到登录页（保持原域名）
+        registry.addViewController("/admin").setViewName("forward:/admin/login.html");
         
         // 页面路由转发 - 处理前端路由刷新问题
         registry.addViewController("/pages/{page:[^.]*}").setViewName("forward:/pages/{page}.html");

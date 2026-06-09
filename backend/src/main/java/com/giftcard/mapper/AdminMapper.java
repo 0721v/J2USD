@@ -19,4 +19,9 @@ public interface AdminMapper extends BaseMapper<Admin> {
     int updateLoginInfo(@Param("adminId") Long adminId, 
                        @Param("loginTime") LocalDateTime loginTime,
                        @Param("ip") String ip);
+    
+    @Update("UPDATE admins SET password_hash = #{passwordHash}, updated_at = #{updatedAt} WHERE id = #{adminId}")
+    int updatePassword(@Param("adminId") Long adminId, 
+                      @Param("passwordHash") String passwordHash,
+                      @Param("updatedAt") LocalDateTime updatedAt);
 }

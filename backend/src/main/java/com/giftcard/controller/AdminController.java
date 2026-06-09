@@ -140,6 +140,72 @@ private GiftCardMapper giftCardMapper;
     }
     
     /**
+     * 修改密码
+     */
+    @PutMapping("/change-password")
+    public Result<String> changePassword(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @RequestHeader(value = "X-Admin-Token", required = false) String token,
+            @RequestBody Map<String, String> params) {
+        
+        String jwtToken = null;
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwtToken = authHeader.substring(7);
+        } else if (token != null && !token.isEmpty()) {
+            jwtToken = token;
+        }
+        
+        if (jwtToken == null) {
+            return Result.error("Unauthorized");
+        }
+        
+        try {
+            jwtUtil.verifyToken(jwtToken);
+            Long adminId = jwtUtil.getAdminIdFromToken(jwtToken);
+            
+            String currentPassword = params.get("currentPassword");
+            String newPassword = params.get("newPassword");
+            
+            if (currentPassword == null || currentPassword.isEmpty()) {
+                return Result.error("Current password is required");
+            }
+            if (newPassword == null || newPassword.isEmpty()) {
+                return Result.error("New password is required");
+            }
+            if (newPassword.length() < 6) {
+                return Result.error("New password must be at least 6 characters");
+            }
+            
+            // 获取管理员信息
+            Admin admin = adminMapper.selectById(adminId);
+            if (admin == null) {
+                return Result.error("Admin not found");
+            }
+            
+            // 验证当前密码
+            boolean passwordMatch = false;
+            if (admin.getPasswordHash().startsWith("$2a$") || admin.getPasswordHash().startsWith("$2b$") || admin.getPasswordHash().startsWith("$2y$")) {
+                passwordMatch = passwordEncoder.matches(currentPassword, admin.getPasswordHash());
+            } else {
+                passwordMatch = currentPassword.equals(admin.getPasswordHash());
+            }
+            
+            if (!passwordMatch) {
+                return Result.error("Current password is incorrect");
+            }
+            
+            // 更新密码（使用BCrypt加密）
+            String encryptedPassword = passwordEncoder.encode(newPassword);
+            adminMapper.updatePassword(adminId, encryptedPassword, LocalDateTime.now());
+            
+            return Result.success("Password changed successfully", null);
+            
+        } catch (Exception e) {
+            return Result.error("Unauthorized");
+        }
+    }
+    
+    /**
      * 检查登录状态（验证 token 是否有效）
      */
     @GetMapping("/check-auth")

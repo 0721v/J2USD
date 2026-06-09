@@ -11,9 +11,9 @@ spring:
     name: giftcard-platform
   
   datasource:
-    url: jdbc:mysql://127.0.0.1:13306/sechema?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: sechema
-    password: Sb7nzPFDfJsdEZxy
+    url: jdbc:mysql://127.0.0.1:13306/schema?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: schema
+    password: B287j5KXSetm5Jmn
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 20
