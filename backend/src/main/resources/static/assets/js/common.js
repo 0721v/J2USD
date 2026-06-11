@@ -578,6 +578,17 @@ function applySiteSettings(lang) {
     if (logo) {
       el.innerHTML = '<img src="' + logo + '" alt="Logo" class="h-8 w-auto object-contain">';
       el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
+
+  // 更新所有 .default-logo 元素（默认的 SVG 图标）
+  document.querySelectorAll('.default-logo').forEach(el => {
+    if (logo) {
+      el.classList.add('hidden');
+    } else {
+      el.classList.remove('hidden');
     }
   });
 }
@@ -635,7 +646,8 @@ function adminFetch(url, options = {}) {
   if (token) {
     options.headers['X-Admin-Token'] = token;
   }
-  if (!options.headers['Content-Type']) {
+  // 如果 body 是 FormData，不设置 Content-Type，让浏览器自动处理
+  if (!options.headers['Content-Type'] && !(options.body instanceof FormData)) {
     options.headers['Content-Type'] = 'application/json';
   }
   return fetch(url, options).then(response => {

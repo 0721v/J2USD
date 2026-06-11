@@ -88,10 +88,17 @@
           
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">网站 Logo</label>
+            <input type="hidden" id="siteLogo" name="site_logo" />
             <div class="flex items-start gap-4">
               <div class="flex-1">
-                <input type="text" id="siteLogo" name="site_logo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none" placeholder="请输入 Logo 图片 URL" />
-                <p class="text-xs text-gray-400 mt-1">输入图片链接地址，支持 PNG/JPG/SVG 格式</p>
+                <div id="logoUploadArea" class="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-blue-500 transition cursor-pointer">
+                  <input type="file" id="logoFile" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="handleLogoUpload(this)" />
+                  <svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <p class="text-sm text-gray-500">点击上传 Logo</p>
+                </div>
+                <p class="text-xs text-gray-400 mt-1">支持 JPG、PNG、WebP 格式，最大5MB</p>
               </div>
               <div id="logoPreview" class="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 flex-shrink-0 overflow-hidden">
                 <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,16 +216,49 @@
     // ========== 登录检查 ==========
     // checkAdminAuth 已在 DOMContentLoaded 中调用
     
-    // ========== Logo 预览 ==========
-    document.getElementById('siteLogo').addEventListener('input', function() {
-      const url = this.value.trim();
-      const preview = document.getElementById('logoPreview');
-      if (url) {
-        preview.innerHTML = `<img src="${url}" alt="Logo预览" class="w-full h-full object-contain" onerror="this.parentElement.innerHTML='<svg class=\\'w-6 h-6 text-red-400\\' fill=\\'none\\' stroke=\\'currentColor\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' stroke-width=\\'2\\' d=\\'M6 18L18 6M6 6l12 12\\'></path></svg>'">`;
-      } else {
-        preview.innerHTML = '<svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>';
-      }
+    // ========== Logo 上传点击事件 ==========
+    document.getElementById('logoUploadArea').addEventListener('click', () => {
+      document.getElementById('logoFile').click();
     });
+
+    // ========== Logo 上传处理 ==========
+    async function handleLogoUpload(input) {
+      const file = input.files[0];
+      if (!file) return;
+
+      const uploadArea = document.getElementById('logoUploadArea');
+      const preview = document.getElementById('logoPreview');
+
+      uploadArea.innerHTML = '<div class="flex items-center justify-center gap-2"><svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg><span class="text-blue-500 text-sm">上传中...</span></div>';
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      try {
+        const response = await adminFetch(`${API_BASE_URL}/upload/image`, {
+          method: 'POST',
+          body: formData
+        });
+
+        console.log('上传响应状态:', response.status, response.statusText);
+
+        const data = await response.json();
+        console.log('上传响应数据:', data);
+
+        if (data.code === 200) {
+          document.getElementById('siteLogo').value = data.data.url;
+          preview.innerHTML = `<img src="${data.data.url}" alt="Logo预览" class="w-full h-full object-contain" />`;
+          uploadArea.innerHTML = '<svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p class="text-sm text-gray-500">点击上传 Logo</p>';
+        } else {
+          showToast(data.message || '上传失败', 'error');
+          uploadArea.innerHTML = '<svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p class="text-sm text-gray-500">点击上传 Logo</p>';
+        }
+      } catch (error) {
+        console.error('上传失败:', error);
+        showToast('上传失败，请重试: ' + error.message, 'error');
+        uploadArea.innerHTML = '<svg class="w-8 h-8 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg><p class="text-sm text-gray-500">点击上传 Logo</p>';
+      }
+    }
     
     // ========== 加载设置 ==========
     async function loadSettings() {
@@ -243,9 +283,12 @@
           if (defaultLangEl) defaultLangEl.value = s.default_lang || 'zh';
           if (orderExpireEl) orderExpireEl.value = s.order_expire || 30;
           
-          // 触发 logo 预览
-          if (s.site_logo && siteLogoEl) {
-            siteLogoEl.dispatchEvent(new Event('input'));
+          // 显示 logo 预览
+          if (s.site_logo) {
+            const preview = document.getElementById('logoPreview');
+            if (preview) {
+              preview.innerHTML = `<img src="${s.site_logo}" alt="Logo预览" class="w-full h-full object-contain" />`;
+            }
           }
         }
       } catch (error) {

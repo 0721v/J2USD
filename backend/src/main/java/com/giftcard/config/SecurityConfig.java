@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers("/pages/**").permitAll()
                 .requestMatchers("/admin/**").permitAll()  // admin HTML 页面由前端 JS 控制跳转
                 .requestMatchers("/assets/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()  // 上传文件公开访问
                 // 公开 API（前台）
                 .requestMatchers("/api/site-settings").permitAll()
                 .requestMatchers("/api/products").permitAll()
@@ -51,6 +52,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/admin/payment-config/trc20/public").permitAll()
                 .requestMatchers("/api/admin/payment-config/okx/public").permitAll()
                 .requestMatchers("/api/admin/check-auth").permitAll()
+                // 文件上传接口
+                .requestMatchers("/api/upload/**").permitAll()
                 .requestMatchers("/error").permitAll()
                 // 其他所有请求需要认证（包括 /api/admin/** 除上面公开的）
                 .anyRequest().authenticated()

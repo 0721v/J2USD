@@ -43,6 +43,18 @@ public interface OrderMapper extends BaseMapper<Order> {
 
     @Select("SELECT COUNT(*) FROM orders WHERE customer_email = #{email} AND query_password = #{queryPassword}")
     int countByEmailAndPassword(@Param("email") String email, @Param("queryPassword") String queryPassword);
+    
+    // 统计今日订单数量
+    @Select("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = #{date}")
+    int countTodayOrders(@Param("date") String date);
+    
+    // 统计今日销售额
+    @Select("SELECT COALESCE(SUM(total_amount), 0) FROM orders WHERE DATE(created_at) = #{date} AND payment_status = 1")
+    java.math.BigDecimal sumTodaySales(@Param("date") String date);
+    
+    // 统计待处理订单数量（status=0 表示待支付）
+    @Select("SELECT COUNT(*) FROM orders WHERE status = 0")
+    int countPendingOrders();
 
     @Select("SELECT o.*, p.name_zh, p.name_en, p.name_ja, p.name_ko " +
             "FROM orders o " +

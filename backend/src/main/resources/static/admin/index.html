@@ -262,6 +262,23 @@
       }
     }
 
+    // 加载统计数据
+    async function loadStatistics() {
+      try {
+        const response = await adminFetch(`${API_BASE_URL}/admin/statistics`);
+        const data = await response.json();
+        
+        if (data.code === 200) {
+          document.getElementById('todayOrders').textContent = data.data.todayOrders || 0;
+          document.getElementById('todaySales').textContent = '¥' + (data.data.todaySales || 0).toFixed(2);
+          document.getElementById('pendingOrders').textContent = data.data.pendingOrders || 0;
+          document.getElementById('totalCards').textContent = data.data.totalCards || 0;
+        }
+      } catch (error) {
+        console.error('加载统计数据失败:', error);
+      }
+    }
+    
     // 加载支付状态
     async function loadPaymentStatus() {
       try {
@@ -291,6 +308,7 @@
     document.addEventListener('DOMContentLoaded', async () => {
       await checkAdminAuth();
       loadAdminInfo();
+      loadStatistics();
       loadPaymentStatus();
     });
   </script>

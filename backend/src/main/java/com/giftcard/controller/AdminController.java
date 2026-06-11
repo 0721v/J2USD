@@ -739,4 +739,38 @@ private GiftCardMapper giftCardMapper;
         orderMapper.deleteById(id);
         return Result.success("Order deleted", null);
     }
+    
+    // ========== 统计数据 ==========
+    
+    /**
+     * 获取仪表板统计数据
+     */
+    @GetMapping("/statistics")
+    public Result<Map<String, Object>> getStatistics() {
+        // 获取今日日期（格式：yyyy-MM-dd）
+        String today = LocalDateTime.now().toLocalDate().toString();
+        
+        // 今日订单数
+        int todayOrders = orderMapper.countTodayOrders(today);
+        
+        // 今日销售额
+        java.math.BigDecimal todaySales = orderMapper.sumTodaySales(today);
+        if (todaySales == null) {
+            todaySales = java.math.BigDecimal.ZERO;
+        }
+        
+        // 待处理订单数（status=0 表示待支付）
+        int pendingOrders = orderMapper.countPendingOrders();
+        
+        // 库存兑换码数量
+        int totalCards = giftCardMapper.countAvailableCardsTotal();
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("todayOrders", todayOrders);
+        result.put("todaySales", todaySales.doubleValue());
+        result.put("pendingOrders", pendingOrders);
+        result.put("totalCards", totalCards);
+        
+        return Result.success(result);
+    }
 }

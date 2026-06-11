@@ -32,4 +32,8 @@ public interface GiftCardMapper extends BaseMapper<GiftCard> {
     @Update("UPDATE gift_cards SET status = 2, used_at = NOW(), used_by = #{usedBy} " +
             "WHERE card_code = #{cardCode} AND status = 1")
     int markAsUsed(@Param("cardCode") String cardCode, @Param("usedBy") String usedBy);
+    
+    // 统计库存兑换码数量（status=0 表示未使用）
+    @Select("SELECT COUNT(*) FROM gift_cards WHERE status = 0")
+    int countAvailableCardsTotal();
 }
